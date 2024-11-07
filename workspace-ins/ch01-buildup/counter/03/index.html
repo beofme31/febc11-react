@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Counter</title>
+</head>
+<body>
+  <!-- 
+  <div id="app">
+    <header>
+      <h1>Counter - JS로 UI 구성</h1>
+      <p>파일 경로: <span id="filepath"></span></p>
+    </header>
+    <div id="counter">
+      <button type="button" onclick="handleDown()">-</button>
+      <button type="button" onclick="handleReset(event)">0</button>
+      <button type="button" onclick="handleUp()">+</button>
+      <span>0</span>
+    </div>
+  </div>
+  -->
+
+  <div id="root"></div>
+
+  <script type="module">
+    // module은 defer 속성을 지정한 것처럼 지연 실행됨
+    // HTML 파싱을 멈추지 않고, HTML 파싱이 끝난 이후에 실행됨
+    // module 끼리는 선언한 순서대로 실행됨
+    import Yong from './yong.js';
+
+    const h1 = Yong.createElement('h1', null, 'Counter - createElement() 라이브러리 사용');
+    const p = Yong.createElement('p', null, '파일 경로: ', Yong.createElement('span', { id: 'filepath' }));
+    const downBtn = Yong.createElement('button', { type: 'button', onclick: 'handleDown()' }, '-');
+    const resetBtn = Yong.createElement('button', { type: 'button', onclick: 'handleReset(event)' }, 0);
+    const upBtn = Yong.createElement('button', { type: 'button', onclick: 'handleUp()' }, '+');
+    const span = Yong.createElement('span', null, 0);
+    const Header = Yong.createElement('header', null, h1, p);
+    const Counter = Yong.createElement('div', { id: 'counter' }, downBtn, resetBtn, upBtn, span);
+    const App = Yong.createElement('div', { id: 'app' }, Header, Counter);
+
+    document.getElementById('root').appendChild(App);
+
+  </script>
+
+  <script type="module">
+    document.querySelector('#filepath').textContent = `ch${document.URL.split('/ch')[1]}index.html`;
+  </script>
+
+  <script type="text/javascript">
+    // 5초 걸리는 코드
+
+    let count = 0;
+
+    const handleDown = () => {
+      // TODO: 데이터 갱신
+      count--;
+      // TODO: 화면 갱신
+      const counterSpan = document.querySelector('#counter > span');
+      counterSpan.textContent = count;
+    };
+    const handleUp = () => {
+      count++;
+      const counterSpan = document.querySelector('#counter > span');
+      counterSpan.textContent = count;
+    };
+    const handleReset = event => {
+      count = 0;
+      const counterSpan = document.querySelector('#counter > span');
+      counterSpan.textContent = count;
+    };
+  </script>
+
+</body>
+</html>
