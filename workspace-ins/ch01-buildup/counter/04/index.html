@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Counter</title>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="module">
+    import Yong from './yong.js';
+    // 애플리케이션의 시작점
+    function App(){
+      return (
+        Yong.createElement('div', { id: 'app' }, 
+          Yong.createElement('header', null, 
+            Yong.createElement('h1', null, 'Counter - createElement() 라이브러리 사용'), 
+            Yong.createElement('p', null, '파일 경로: ', 
+              Yong.createElement('span', { id: 'filepath' }, `ch${document.URL.split('/ch')[1]}index.html`))), 
+          Yong.createElement('div', { id: 'counter' }, 
+            Yong.createElement('button', { type: 'button', onclick: 'handleDown()' }, '-'), 
+            Yong.createElement('button', { type: 'button', onclick: 'handleReset(event)' }, 0), 
+            Yong.createElement('button', { type: 'button', onclick: 'handleUp()' }, '+'), 
+            Yong.createElement('span', null, 0)))
+      );
+    }
+
+    // document.getElementById('root').appendChild(App);
+    Yong.createRoot(document.getElementById('root')).render(App);
+
+  </script>
+
+  <script type="text/javascript">
+    let count = 0;
+
+    const handleDown = () => {
+      // TODO: 데이터 갱신
+      count--;
+      // TODO: 화면 갱신
+      const counterSpan = document.querySelector('#counter > span');
+      counterSpan.textContent = count;
+    };
+    const handleUp = () => {
+      count++;
+      const counterSpan = document.querySelector('#counter > span');
+      counterSpan.textContent = count;
+    };
+    const handleReset = event => {
+      count = 0;
+      const counterSpan = document.querySelector('#counter > span');
+      counterSpan.textContent = count;
+    };
+  </script>
+
+</body>
+</html>
