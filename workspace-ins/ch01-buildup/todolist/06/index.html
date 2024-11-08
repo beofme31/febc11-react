@@ -6,24 +6,10 @@
   <title>Todo List App</title>
 </head>
 <body>
-
   <div id="root"></div>
 
   <script type="module">
-
     import yong from '../yong.js';
-
-    function App(){
-
-    }
-
-    yong.createRoot(document.getElementById('root')).render(App);
-
-  </script>
-  
-  <script type="module">
-    document.querySelector('#filepath').textContent = `ch${document.URL.split('/ch')[1]}index.html`;
-
     // 샘플 목록
     let itemList = [
       { no: 1, title: '두부', done: true} ,
@@ -31,65 +17,61 @@
       { no: 3, title: '라면', done: true },
     ];
 
-    // ul 요소
-    const todolistElem = document.querySelector('.todolist');
-
-    // 기존 목록 삭제
-    while(todolistElem.firstChild){
-      todolistElem.firstChild.remove();
-    }
-
-    // itemList 배열의 각 Todo 아이템을 화면에 추가
-    itemList.forEach((item, index) => {
-      const liElem = getTodoItemElem(item);
-      todolistElem.appendChild(liElem);      
-    });
-
     // 한건의 Todo 객체를 받아서 DOM 객체로 만들어 반환
     function getTodoItemElem(item){
-      const liElem = document.createElement('li');
-      const noElem = document.createElement('span');
-      const titleElem = document.createElement('span');
-      const deleteElem = document.createElement('button');
-      
-      const noTxt = document.createTextNode(item.no);
-      const titleTxt = document.createTextNode(item.title);
-      const deleteTxt = document.createTextNode('삭제');
-
-      noElem.appendChild(noTxt);
-      if(item.done){ // 완료
-        const sElem = document.createElement('s');
-        sElem.appendChild(titleTxt);
-        titleElem.appendChild(sElem);
-      }else{ // 미완료
-        titleElem.appendChild(titleTxt);
-      }
-      deleteElem.setAttribute('type', 'button');
-      deleteElem.appendChild(deleteTxt);
-      liElem.appendChild(noElem);
-      liElem.appendChild(titleElem);
-      liElem.appendChild(deleteElem);
-      liElem.setAttribute('data-no', item.no);
-      titleElem.setAttribute('onclick', `toggleDone(${ item.no })`);
-      deleteElem.setAttribute('onclick', `deleteItem(${ item.no })`);
-
-      return liElem;
+      return (
+        yong.createElement('li', { 'data-no': item.no }, 
+          yong.createElement('span', null, item.no),
+          yong.createElement('span', { onclick: () => toggleDone(item.no) }, 
+            item.done? yong.createElement('s', null, item.title) : item.title), 
+          yong.createElement('button', { onclick: () => deleteItem(item.no) }, '삭제'))
+      );
     }
 
-    // "추가" 클릭 이벤트 핸들러
-    const handleAdd = () => {
-      const inputElem = document.querySelector('.todoinput > input');
-      if(inputElem.value.trim() !== ''){
-        addItem(inputElem.value);
-        inputElem.value = '';
-        inputElem.focus();
-      }
-    };
+    function App(){
 
-    // 엔터 이벤트 핸들러
-    const handleAddKeyup = (event) => {
-      if(event.key === 'Enter') handleAdd();
-    };
+      // "추가" 클릭 이벤트 핸들러
+      const handleAdd = () => {
+        const inputElem = document.querySelector('.todoinput > input');
+        if(inputElem.value.trim() !== ''){
+          addItem(inputElem.value);
+          inputElem.value = '';
+          inputElem.focus();
+        }
+      };
+
+      // 엔터 이벤트 핸들러
+      const handleAddKeyup = (event) => {
+        if(event.key === 'Enter') handleAdd();
+      };
+
+      const Header =
+        yong.createElement('header', null, 
+          yong.createElement('h1', null, 'Todo List - yong.createElement() 사용 :)'), 
+          yong.createElement('p', null, '파일 경로: ', 
+            yong.createElement('span', { id: 'filepath' }, `ch${document.URL.split('/ch')[1]}index.html`)));
+
+      const list = itemList.map((item) => getTodoItemElem(item));
+
+      const Todo = 
+        yong.createElement('div', { id: 'main' }, 
+          yong.createElement('div', { id: 'container' }, 
+            yong.createElement('ul', null, 
+              yong.createElement('li', null, 
+                yong.createElement('h2', null, '쇼핑 목록'), 
+                yong.createElement('div', { class: 'todoinput' }, 
+                  yong.createElement('input', { type: 'text', autofocus: '', onkeyup: event => handleAddKeyup(event) }), 
+                  yong.createElement('button', { type: 'button', onclick: handleAdd }, '추가')),
+                yong.createElement('ul', { class: 'todolist' }, list)))));
+
+      const Footer = 
+        yong.createElement('footer', null, 
+          yong.createElement('p', null, '멋쟁이 사자처럼 FrontEnd BootCamp'));
+      
+      return yong.createElement('div', { id: 'todo' }, Header, Todo, Footer);
+    }
+
+    yong.createRoot(document.getElementById('root')).render(App);
 
     // 할일 추가
     function addItem(title){
@@ -136,7 +118,6 @@
       const selectedLiElem = document.querySelector(`.todolist > li[data-no="${ no }"]`);
       selectedLiElem.remove();
     }
-
   </script>
 </body>
 </html>
