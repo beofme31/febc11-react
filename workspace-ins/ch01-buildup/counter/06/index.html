@@ -22,16 +22,16 @@
 
     function Counter(){
       // let count = 0;
-      let [count, setCount] = Yong.useState(10);
+      const [count, setCount] = Yong.useState(10);
 
       const handleDown = () => {
-        count--;
+        setCount(count - 1);
       };
       const handleUp = () => {
-        count++;
+        setCount(count + 1);
       };
       const handleReset = event => {
-        count = 0;
+        setCount(0);
       };
 
       return (
