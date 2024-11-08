@@ -1,8 +1,11 @@
-const yong = {
+const yong = (() => {
+  let _root;
+  let _stateValue;
+
   // 지정한 속성과 자식 노드를 가지는 요소 노드를 생성해서 반환
   // <button type="button" onclick="handleUp()">+</button>
   // createElement('button', { type: 'button', onclick: 'handleUp()' }, '+');
-  createElement: (tag, props, ...children) => {
+  const createElement = (tag, props, ...children) => {
     // 요소 노드 생성
     const elem = document.createElement(tag);
 
@@ -29,18 +32,26 @@ const yong = {
     }
 
     return elem;
-  },
+  };
 
   // 루트노드를 관리하는 객체를 생성해서 반환
   // createRoot(document.getElementById('root')).render(App);
-  createRoot: (rootNode) => {
+  const createRoot = (rootNode) => {
     return {
       // 루트노드 하위에 지정한 함수를 실행해서 받은 컴포넌트를 렌더링 한다.
       render(appFn){
         rootNode.appendChild(appFn())
       }
     };
-  }
-};
+  };
+
+  // 상태값 관리
+  // let [count, setCount] = Yong.useState(10);
+  const useState = (initValue) => {
+
+  };
+
+  return {};
+})();
 
 export default yong;

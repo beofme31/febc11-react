@@ -21,7 +21,8 @@
     }
 
     function Counter(){
-      let count = 0;
+      // let count = 0;
+      let [count, setCount] = Yong.useState(10);
 
       const handleDown = () => {
         count--;
