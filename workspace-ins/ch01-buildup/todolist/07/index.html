@@ -33,7 +33,7 @@
     }
 
     // 입력창 구성
-    function TodoInput(){
+    function TodoInput({ handleAdd, handleAddKeyup }){
       return (
         yong.createElement('div', { class: 'todoinput' }, 
           yong.createElement('input', { type: 'text', autofocus: '', onkeyup: event => handleAddKeyup(event) }), 
@@ -42,7 +42,7 @@
     }
 
     // 할일 아이템 하나 구성
-    function TodoItem(){
+    function TodoItem({ item, toggleDone, deleteItem }){
       return (
         yong.createElement('li', { 'data-no': item.no }, 
           yong.createElement('span', null, item.no),
@@ -53,20 +53,21 @@
     }
 
     // 할일 목록 구성
-    function TodoList(){
+    function TodoList(props){
+      const list = props.itemList.map((item) => TodoItem({ item, toggleDone: props.toggleDone, deleteItem: props.deleteItem }));
       return yong.createElement('ul', { class: 'todolist' }, list);
     }
     
     // 할일 구성
-    function Todo(){
+    function Todo(props){
       return (
         yong.createElement('div', { id: 'main' }, 
           yong.createElement('div', { id: 'container' }, 
             yong.createElement('ul', null, 
               yong.createElement('li', null, 
                 yong.createElement('h2', null, '쇼핑 목록'), 
-                TodoInput,
-                TodoList))))
+                TodoInput({ handleAdd: props.handleAdd, handleAddKeyup: props.handleAddKeyup }),
+                TodoList({ itemList: props.itemList, toggleDone: props.toggleDone, deleteItem: props.deleteItem })))))
       );
     }
     
@@ -114,7 +115,7 @@
         itemList.push(item);
 
         // TODO: 화면 갱신
-        const liElem = getTodoItemElem(item);
+        const liElem = TodoItem({ item, toggleDone, deleteItem });
         const todolistElem = document.querySelector('.todolist');
         todolistElem.appendChild(liElem);
       }
@@ -148,9 +149,9 @@
         selectedLiElem.remove();
       }
 
-      const list = itemList.map((item) => getTodoItemElem(item));
+      
 
-      return yong.createElement('div', { id: 'todo' }, Header, Todo, Footer);
+      return yong.createElement('div', { id: 'todo' }, Header, Todo({ handleAdd, handleAddKeyup, itemList, toggleDone, deleteItem }), Footer);
     }
 
     yong.createRoot(document.getElementById('root')).render(App);
