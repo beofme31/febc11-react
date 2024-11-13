@@ -14,13 +14,23 @@
     <p>개발자 도구의 콘솔을 확인하세요.</p>
   </div>
   <footer>
-    <p>Front-End School 9기</p>
+    <p>Front-End BootCamp</p>
   </footer>
 
   <script type="module">
     document.querySelector('#filepath').textContent = `ch${document.URL.split('/ch')[1]}index.html`;
 
-    
+    import MyMath, { plus, minus, avg } from './export.js';
+
+    console.log(plus(10, 20));
+    console.log(minus(10, 20));
+    console.log(avg(10, 20, 30));
+
+    console.log(MyMath.multiple(10, 20));
+
+    console.log(MyMath.sum(10, 20, 30));
+    console.log(MyMath.divide(10, 20));
+
   </script>
 
 </body>
