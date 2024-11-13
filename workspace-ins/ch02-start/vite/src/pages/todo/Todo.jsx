@@ -1,4 +1,4 @@
-import Title from '../../components/Title';
+import Title from "@components/Title";
 
 function Todo(){
   return (
@@ -8,5 +8,4 @@ function Todo(){
     </div>
   );
 }
-
 export default Todo;
