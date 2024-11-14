@@ -417,7 +417,7 @@
 * initialState: 상태값의 초기값(초기 렌더링 후 무시됨)
 
 ##### 리턴값
-* state: 상태값이 저장된 getter
+* state: 저장된 상태값
 * setState: 상태값을 변경하는 setter 함수. setter를 통해 상태가 변경되면 해당 컴포넌트는 다시 렌더링됨
 
 #### useState() 특징

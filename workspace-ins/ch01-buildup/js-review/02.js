@@ -21,7 +21,7 @@ console.log(second);
 
 console.log(second.no, second.todo);
 
-const no = 100;
+var no = 100;
 var { todo, no: number, hello } = second;
 console.log(number, todo, hello);
 
