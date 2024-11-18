@@ -12,9 +12,9 @@ function App(){
           // 속성을 직접 수정하면 리렌더링되지 않음
           // position.x = event.clientX;
           // position.y = event.clientY;
+          // setPosition(position);
 
           const newPosition = { x: event.clientX, y: event.clientY - 80 };
-
           setPosition(newPosition);
 
           console.log(position);
