@@ -24,6 +24,7 @@ class ClickMe extends Component {
   // 2-2
   shouldComponentUpdate(nextProps, nextState){
     console.log('2-2 shouldComponentUpdate 호출됨.');
+    return true;
   }
 
   // 1-3/2-3
@@ -45,6 +46,7 @@ class ClickMe extends Component {
   // 2-4
   getSnapshotBeforeUpdate(prevProps, prevState){
     console.log('2-4 getSnapshotBeforeUpdate 호출됨.');
+    return 'hello';
   }
 
   // 2-5
