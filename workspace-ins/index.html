@@ -81,6 +81,22 @@
     </header>
     <div class="main-contents">
 
+      <section id="chapter-app" class="chapter">
+        <div class="chapter-title">
+        	<h3 tabindex="0">App</h3>
+        	<button>예제 목록 펼치기</button>
+        </div>
+        <section class="paragraph">
+          <h4 class="paragraph-title">Todo List</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=app/todolist/01-container">01 컨테이너 컴포넌트 추가</a></li>
+            <li><a href="run-react.html?filepath=app/todolist/02-reduce">02 TodoReducer에서 상태 관리 로직 작성, useRef로 input 요소에 포커스 추가</a></li>
+            <li><a href="run-react.html?filepath=app/todolist/03-memo">03 React.memo, useCallback으로 메모이제이션</a></li>
+            <li><a href="run-react.html?filepath=app/todolist/04-router">04 리액트 라우터 적용</a></li>
+          </ul>
+        </section>
+      </section>
+      
       <section id="chapter-01" class="chapter">
         <div class="chapter-title">
         	<h3 tabindex="0">1장 리액트 빌드업</h3>
@@ -221,121 +237,50 @@
             <li><a href="run-react.html?filepath=ch02-start/state/01">01 state 대신 컴포넌트 외부의 변수 사용시 문제점</a></li>
             <li><a href="run-react.html?filepath=ch02-start/state/02">02 이벤트 핸들러에서 state 값을 여러번 변경했을 때 문제점</a></li>
             <li><a href="run-react.html?filepath=ch02-start/state/03">03 상태관리 대상이 객체일 경우 주의 사항</a></li>
-            <li><a href="run-react.html?filepath=ch02-start/state/04">04 상태관리 대상이 복합 객체일 경우 불변성 (feat. immer님)</a></li>
+            <li><a href="run-react.html?filepath=ch02-start/state/04">04 상태관리 대상이 복합 객체일 경우 불변성 (feat. immer)</a></li>
             <li><a href="run-react.html?filepath=ch02-start/state/05">05 회원가입 입력값 상태 관리</a></li>
             <li><a href="run-react.html?filepath=ch02-start/state/06">06 회원가입 입력값 검증 (feat. react-hook-form)</a></li>
-            <li><a href="run-react.html?filepath=app/todolist/01">07 Todo List - 이게 진짜 (feat. Vite)</a></li>
           </ul>
         </section>
       </section>
 
-      <section id="chapter-03" class="chapter">
+      <section id="chapter-03" class="chapter chapter-open">
         <div class="chapter-title">
         	<h3 tabindex="0">3장 리액트 훅</h3>
         	<button>예제 목록 펼치기</button>
         </div>
         <section class="paragraph">
+          <h4 class="paragraph-title">3-1 리액트 훅</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch03-hooks/01-useState">01 useState - 상태 관리</a></li>
+            <li><a href="run-react.html?filepath=ch03-hooks/02-useEffect">02 useEffect - side effect 관리</a></li>
+            <li><a href="run-react.html?filepath=ch03-hooks/03-useReducer">03 useReducer - 상태 관리 로직을 한곳에</a></li>
+            <li><a href="run-react.html?filepath=ch03-hooks/04-useRef">04 useRef - 데이터 관리, DOM 엘리먼트 참조</a></li>
+            <li><a href="run-react.html?filepath=ch03-hooks/05-useMemo">05 useMemo - 함수의 반환값을 memoize</a></li>
+            <li><a href="run-react.html?filepath=ch03-hooks/06-useCallback">06 useCallback(함수 자체를 memoize), React.memo(컴포넌트를 memoize)</a></li>
+          </ul>
 
+          <h4 class="paragraph-title">3-2 커스텀 훅</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch03-hooks/07-customHook">07 customHook - useCounter 커스텀 훅 사용</a></li>
+            <li><a href="run-react.html?filepath=ch03-hooks/08-customHook">08 customHook - 커스텀 훅 없이 fetch API 사용</a></li>
+            <li><a href="run-react.html?filepath=ch03-hooks/09-customHook">09 customHook - useFatch, useAxios 커스텀 훅 사용</a></li>
+          </ul>
         </section>
       </section>
 
-      <section id="chapter-04" class="chapter">
+      <section id="chapter-04" class="chapter chapter-open">
         <div class="chapter-title">
         	<h3 tabindex="0">4장 클래스 컴포넌트와 컴포넌트의 라이프 사이클</h3>
         	<button>예제 목록 펼치기</button>
         </div>
         <section class="paragraph">
-          
-        </section>
-      </section>
-
-      <section id="chapter-05" class="chapter">
-        <div class="chapter-title">
-        	<h3 tabindex="0">5장 고차 함수</h3>
-        	<button>예제 목록 펼치기</button>
-        </div>
-        <section class="paragraph">
-
-        </section>
-      </section>
-
-      <section id="chapter-06" class="chapter">
-        <div class="chapter-title">
-        	<h3 tabindex="0">6장 컨텍스트 API</h3>
-        	<button>예제 목록 펼치기</button>
-        </div>
-        <section class="paragraph">
-
-        </section>
-      </section>
-
-      <section id="chapter-07" class="chapter">
-        <div class="chapter-title">
-        	<h3 tabindex="0">7장 리액트 라우터</h3>
-        	<button>예제 목록 펼치기</button>
-        </div>
-        <section class="paragraph">
-          
-        </section>
-      </section>
-
-      <section id="chapter-08" class="chapter">
-        <div class="chapter-title">
-        	<h3 tabindex="0">8장 상태 관리 라이브러리</h3>
-        	<button>예제 목록 펼치기</button>
-        </div>
-        <section class="paragraph">
-
-        </section>
-      </section>
-
-      <section id="chapter-09" class="chapter">
-        <div class="chapter-title">
-        	<h3 tabindex="0">9장 리액트에서 CSS 사용</h3>
-        	<button>예제 목록 펼치기</button>
-        </div>
-        <section class="paragraph">
-
-        </section>
-      </section>
-
-      <section id="chapter-10" class="chapter">
-        <div class="chapter-title">
-        	<h3 tabindex="0">10장 HTTP 통신과 Ajax</h3>
-        	<button>예제 목록 펼치기</button>
-        </div>
-        <section class="paragraph">
-
-        </section>
-      </section>
-
-      <section id="chapter-11" class="chapter">
-        <div class="chapter-title">
-        	<h3 tabindex="0">11장 백엔드 개발과 API 서버</h3>
-        	<button>예제 목록 펼치기</button>
-        </div>
-        <section class="paragraph">
-
-        </section>
-      </section>
-
-      <section id="chapter-12" class="chapter">
-        <div class="chapter-title">
-        	<h3 tabindex="0">12장 Next.js</h3>
-        	<button>예제 목록 펼치기</button>
-        </div>
-        <section class="paragraph">
-
-        </section>
-      </section>
-
-      <section id="chapter-13" class="chapter">
-        <div class="chapter-title">
-        	<h3 tabindex="0">13장 프로젝트 준비</h3>
-        	<button>예제 목록 펼치기</button>
-        </div>
-        <section class="paragraph">
-
+          <h4 class="paragraph-title">클래스 컴포넌트</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch04-class/01">01 클래스 컴포넌트</a></li>
+            <li><a href="run-react.html?filepath=ch04-class/02">02 클래스 컴포넌트 - 함수형 컴포넌트와 같이 사용</a></li>
+            <li><a href="run-react.html?filepath=ch04-class/03">03 클래스 컴포넌트 - 컴포넌트의 라이프 사이클</a></li>
+          </ul>
         </section>
       </section>
 
