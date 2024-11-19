@@ -223,10 +223,7 @@ git pull upstream main
 * <https://babeljs.io/repl>
 
 ### React 공식 홈페이지
-* <https://react.dev>
-
-### React 홈페이지 한글 (비공식)
-* <https://react-ko.dev>
+* <https://ko.react.dev>
 
 ### JSX 변환기 (HTML을 JSX로 변환)
 * <https://transform.tools/html-to-jsx>

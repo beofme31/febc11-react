@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>삼항 연산자</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7/babel.min.js"></script>
+
+  <style>
+    .active {
+      background-color: #4CAF50;
+      color: white;
+      border: 1px solid #4CAF50;
+      cursor: pointer;
+    }
+    .inactive {
+      background-color: #f0f0f0;
+      color: #999;
+      border: 1px solid #ccc;
+      cursor: not-allowed;
+    }
+    button {
+      padding: 4px 16px;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>삼항 연산자를 이용한 조건부 렌더링 :()</h1>
+    <p>파일 경로: <span id="filepath"></span></p>
+  </header>
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    document.querySelector('#filepath').textContent = `ch${document.URL.split('/ch')[1]}index.html`;
+
+    // 1. 로그인 체크
+    function App1() {
+      var isLogin = true;
+      // var isLogin = false;
+      
+      return (
+        <>
+        
+        </>
+      );
+    }
+
+    // 2. 목록 조회
+    function App2() {
+      var itemList = [{ _id: 1, title: '두부' }, { _id: 2, title: '계란' }, { _id: 3, title: '라면' }];
+      // var itemList = [];
+
+      return (
+        <>
+          
+        </>
+      );
+    }
+
+    // 3. 삼항 연산자 중첩
+    function App3(){
+      var status = 'online';
+      // var status = 'away';
+
+      return (
+        <>
+          
+        </>
+      );
+    }
+
+    // 4. 조건부 클래스 적용
+    function App4(){
+      var isActive = true;
+      // var isActive = false;
+
+      return (
+        <>
+          
+        </>
+      );
+    }
+
+    // 5. 조건에 따라 요소를 생성하지 않기
+    function App5(){
+      var isShow = false;
+      // var isShow = true;
+
+      return (
+        <>
+          
+        </>
+      );
+    }
+
+    function App(){
+      return (
+        <>
+          <App1 />
+          <App2 />
+          <App3 />
+          <App4 />
+          <App5 />
+        </>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

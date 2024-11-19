@@ -4,7 +4,7 @@ var isPrime = function(num){
   console.log('소수 판별 시작.', num);
 
   // TODO: 소수 판별 코드
-  let prime = true;
+  let prime = num > 1; // 1은 소수가 아님
 
 
   console.log('소수 판별 결과.', prime);
