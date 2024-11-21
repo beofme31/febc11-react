@@ -1,0 +1,471 @@
+# 9장 HTTP 통신과 Ajax
+* 소스 코드(GitHub): <https://github.com/uzoolove/febc11-react/tree/main/workspace-ins/ch09-ajax>
+* 코드 실행(GitHub Page): <https://uzoolove.github.io/febc11-react/workspace-ins/index.html#09>
+
+## HTTP
+
+### HTTP란?
+HTTP(HyperText Transfer Protocol)는 웹 브라우저와 웹 서버 간 텍스트 기반으로 데이터를 송수신하기 위한 프로토콜
+
+#### 주요 특징
+- TCP 기반 프로토콜
+  - 클라이언트와 서버가 연결을 수립한 후 메시지를 교환
+  - 데이터를 패킷 단위로 전송하며, 수신 측에서 데이터를 검증한 뒤 응답을 보냄
+  - 데이터 누락 시 재전송 요청을 처리하여 신뢰성이 높음
+  - 주로 HTTP, FTP, SMTP 등 신뢰성이 중요한 통신에서 사용됨
+
+#### 동작 방식
+1. 클라이언트 요청 (Request)
+   - 클라이언트(주로 웹 브라우저)가 HTTP 요청 메시지를 서버로 전송
+   - 요청에는 필요한 자원(URL)이나 작업(GET, POST 등 요청 메서드 포함)이 포함됨
+
+2. 서버 응답 (Response)
+   - 서버는 요청을 분석하여 필요한 작업을 수행
+     - 파일 읽기, 데이터베이스 조회, 외부 시스템 연동 등
+   - 작업 결과를 바탕으로 응답 메시지를 생성하여 클라이언트로 전송
+
+3. 웹 브라우저 처리
+   - 클라이언트는 서버 응답 데이터를 받아 파싱한 후 화면에 출력
+   - 서버의 응답을 받은 후 클라이언트와 서버 간 연결이 해제됨 (HTTP/1.x의 경우 기본적으로 비연결형(Connectionless) 프로토콜)
+
+#### 장점
+- 신뢰성: TCP를 기반으로 하여 데이터 전달의 신뢰성이 높음
+- 범용성: 전 세계적으로 가장 널리 사용되는 웹 통신 프로토콜
+
+#### 참고
+HTTP/2와 HTTP/3는 기존 HTTP/1.x의 비효율성을 개선하기 위해 다중화, 헤더 압축, UDP 기반 전송 등의 기술을 도입
+
+### HTTP의 특징
+
+#### 비연결성(Connectionless)
+- 클라이언트가 요청을 보내고 서버가 응답하면 상호 연결을 해제함
+- 서버는 클라이언트가 누구인지 신경 쓰지 않고 요청 정보를 분석해 적절한 응답을 만드는 데만 집중함
+- 서버 구현이 단순해져 웹 발전에 큰 역할을 함
+
+#### 무상태(Stateless)
+- 서버는 클라이언트의 요청 정보만 가지고 응답을 생성하며, 클라이언트의 상태를 기억하지 않음
+- 요청한 사용자가 누구인지, 이전에 어떤 작업을 요청했는지를 관리하지 않음
+- 웹이 발전하면서 클라이언트 정보를 저장할 필요가 생겼고, 이를 위해 Cookie, Session, Local Storage 등의 저장 방식이 도입됨
+
+
+### HTTP 주요 메소드
+
+#### GET
+- 서버로부터 자원을 가져올 때 사용
+  - 할일 목록 조회
+  - 할일 상세 조회
+  - 회원 정보 조회
+
+#### POST
+- 서버로 데이터를 보낼 때 사용
+  - 할일 등록
+  - 회원 등록
+
+#### PUT
+- 서버의 데이터 한 건을 전체 항목 수정 시 사용
+  - 특정 할일의 모든 항목 수정
+  - 특정 회원의 회원 정보 전체 수정
+
+#### PATCH
+- 서버의 데이터 한 건을 일부 항목 수정 시 사용
+  - 특정 할일의 완료 여부 수정
+  - 특정 회원의 비밀번호 수정
+
+#### DELETE
+- 서버의 데이터 한 건을 삭제할 때 사용
+  - 할일 삭제
+  - 회원 삭제
+
+
+## Ajax
+
+### Ajax란?
+- Ajax(Asynchronous JavaScript and XML)는 클라이언트와 서버 간 비동기 통신 기법
+- 자바스크립트로 HTTP 요청을 보내고 응답을 받아 처리하는 방식
+  - 과거에는 XML을 주로 사용했지만, 현재는 JSON이 더 선호됨
+- 페이지 이동이나 새로고침 없이 서버에 요청을 보내고 DOM API를 이용해 화면을 갱신
+
+### XMLHttpRequest 객체
+- 서버에 HTTP 요청을 만들고 전송할 수 있는 자바스크립트 객체
+- 웹 초창기부터 사용되어 구버전 브라우저에서도 동작
+
+#### 사용 예시
+```js
+function getTodoList(callback){
+  const xhr = new XMLHttpRequest();
+  xhr.onload = () => {
+    const data = xhr.responseText;
+    const jsonData = JSON.parse(data);
+    callback(jsonData);
+  };
+  xhr.open('GET', 'http://example.com/todolist', true);
+  xhr.send();
+}
+```
+
+### fetch API
+- ECMAScript 6에서 추가된 HTTP 클라이언트
+- 콜백 기반인 XMLHttpRequest와 달리 Promise 기반으로 설계됨
+- XMLHttpRequest를 대체할 수 있는 표준 API
+- XMLHttpRequest보다 나은 선택이지만 다음과 같은 단점이 있음
+  - 응답 객체에서 본문을 바로 꺼낼 수 없으며, JSON이나 다른 데이터 타입으로 파싱이 필요
+  - 네트워크 에러를 제외한 HTTP 응답 에러(4xx, 5xx)에 대해 오류가 발생하지 않으므로 별도로 체크 필요
+  - 이러한 이유로 axios와 같은 라이브러리에 비해 사용이 다소 불편
+  
+#### 사용 예시
+```js
+async function getTodoList() {
+  try{
+    const response = await fetch('http://example.com/todolist');
+    if (response.ok) {
+      const jsonData = await response.json();
+      return jsonData;
+    }else{
+      // 404 같은 HTTP 응답 오류에 대한 처리
+    }
+  }catch(err){
+    // 네트워크 에러에 대한 처리
+  }
+}
+```
+
+### axios 라이브러리
+- Node.js와 브라우저에서 사용 가능한 Promise 기반 HTTP 클라이언트
+- XMLHttpRequest 객체를 기반으로 동작하여 Fetch API보다 호환성 좋음
+- 요청 및 응답을 가로채는 인터셉터 기능 제공
+- JSON 형식의 응답 데이터를 자동으로 객체로 파싱
+- timeout 설정 가능
+
+#### 사용 예시
+```js
+async function getTodoList(){
+  try{
+    const response = await axios.get('http://example.com/todolist');
+    return response.data;
+  }catch(err){
+    // 네트워크 에러나 HTTP 응답 에러 처리
+  }
+}
+```
+
+#### 설치
+```sh
+npm i axios
+```
+
+#### API
+##### axios(url, config?), axios(config), axios.request(config)
+* 지정한 url로 HTTP 요청을 보낸다.(기본 GET 방식)
+
+* 사용 사례
+  ```js
+  const itemList = await axios('https://todo-api.fesp.shop/api/todolist'); 
+  ```
+
+  ```js
+  const itemList = await axios('https://todo-api.fesp.shop/api/todolist', {
+    method: 'post',
+    data: {
+      title: '할일 1',
+      content: '내용 1'
+    }
+  }); 
+  ```
+
+  ```js
+  const itemList = await axios({
+    url: 'https://todo-api.fesp.shop/api/todolist/1',
+    method: 'patch',
+    data: {
+      title: '할일 1 수정',
+      content: '내용 1 수정'
+    }
+  }); 
+  ```
+
+  ```js
+  const itemList = await axios.request({
+    url: 'https://todo-api.fesp.shop/api/todolist/1',
+    method: 'delete'
+  });
+  ```
+
+* config 객체의 주요 속성
+  ```js
+  {
+    // 요청에 사용될 서버 URL
+    url: '/todolist',
+
+    // 요청을 생성할때 사용되는 메소드
+    method: 'get', // 기본값
+
+    // `url`이 절대값이 아닌 경우 `baseURL`이 url 앞에 붙음
+    baseURL: 'https://todo-api.fesp.shop/api',
+    
+    // 사용자 지정 헤더
+    headers: {'Authrization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'},
+
+    // `params`은 요청과 함께 전송되는 URL 파라미터
+    // 반드시 일반 객체나 URLSearchParams 객체여야 함
+    // 참고: null이나 undefined는 URL에 렌더링되지 않음
+    params: {
+      page: 3,
+      limit: 10
+    },
+
+    // 요청 바디로 전송될 데이터
+    // 'PUT', 'POST', 'PATCH', 'DELETE' 메소드에서만 적용 가능
+    // 다음 타입 중 하나여야 함
+    // - string, plain object, ArrayBuffer, ArrayBufferView, URLSearchParams
+    // - 브라우저 전용: FormData, File, Blob
+    data: {
+      title: '10시간 푹자기',
+      content: '이번 주말에 도전해야지'
+    },
+
+    // 응답이 `timeout(밀리초)`보다 오래 걸리면 요청이 중단되고 timeout 에러 발생
+    timeout: 1000, // 기본값은 `0` (타임아웃 없음)
+
+    // 자격 증명을 사용하여 사이트 간 액세스 제어 요청을 해야 하는지 여부 지정
+    withCredentials: false, // 기본값
+  }
+  ```
+
+##### HTTP 메소드별로 제공되는 함수
+* axios.get(url, config?)
+  ```js
+  const response = await axios.get('/todolist');
+  setItems(response.data.items);
+  ```
+
+* axios.post(url, data, config?)
+  ```js
+  try{
+    await axios.post('/todolist', {
+      title: '할일 1',
+      content: '내용 1'
+    });
+    alert('할일이 추가 되었습니다.');
+  }catch(err){
+    console.error(err);
+    alert('할일 추가에 실패했습니다.');
+  }
+  ```
+
+* axios.delete(url, config?)
+  ```js
+  try{
+    await axios.delete(`/todolist/${_id}`);
+    alert('할일이 삭제 되었습니다.');
+  }catch(err){
+    console.error(err);
+    alert('할일 삭제에 실패했습니다.');
+  }
+  ```
+
+* axios.patch(url, data, config?)
+  ```js
+  try{
+    await axios.patch(`/todolist/${_id}`, {
+      content: '수정된 내용'
+    });
+    alert('할일을 수정했습니다.');
+  }catch(err){
+    console.error(err);
+    alert('할일 수정에 실패했습니다.');
+  }
+  ```
+
+* axios.put(url, data, config?)
+* axios.head(url, config?)
+* axios.options(url, config?)
+
+#### Axios 인스턴스
+* 지정한 config 정보로 새로운 Axios 인스턴스 생성
+
+##### 사용 예시
+```js
+const instance = axios.create({
+  baseURL: 'https://todo-api.fesp.shop/api', // 기본 URL
+  timeout: 3000, // 지정한 시간이 지나도록 응답이 완료되지 않으면 timeout 에러 발생
+  headers: {
+    'content-type': 'application/json', // request의 데이터 타입
+    accept: 'application/json'  // response의 데이터 타입
+  },
+});
+
+instance.get('/list', {
+  params: {
+    page: 3,
+    limit: 10
+  },
+});
+```
+
+#### 인터셉터
+* axios로 서버에 HTTP 요청을 보내기 직전이나 응답이 도착해서 리턴되기 전에 요청과 응답을 가로채서 추가적인 작업 수행 가능
+
+##### 사용 사례
+```js
+// 요청 인터셉터 추가하기
+axios.interceptors.request.use((config) => {
+  // 요청이 전달되기 전에 필요한 공통 작업 수행
+
+  return config;
+}, (error) => {
+  // 공통 에러 처리
+
+  return Promise.reject(error);
+});
+
+// 응답 인터셉터 추가하기
+axios.interceptors.response.use((response) => {
+  // 2xx 범위에 있는 상태 코드는 이 함수가 호출됨
+  // 응답 데이터를 이용해서 필요한 공통 작업 수행
+
+  return response;
+}, (error) => {
+  // 2xx 외의 범위에 있는 상태 코드는 이 함수가 호출됨
+  // 공통 에러 처리
+
+  return Promise.reject(error);
+});
+```
+
+### React Query(TanStack Query)
+* 참고: https://tanstack.com/query
+* React에서 Axios 같은 비동기 데이터 처리 작업을 손쉽게 사용할 수 있도록 지원하는 라이브러리
+* API 서버로부터 받아온 데이터를 캐시하거나 폴링하는 작업을 자동으로 수행해서 서버의 상태를 클라이언트와 동기화
+* Pagination, Infinite Scroll 같은 성능 최적화에 필요한 기능 제공
+
+#### 설치
+* React Query
+  ```sh
+  npm i @tanstack/react-query
+  ```
+
+* 개발자 도구
+  ```sh
+  npm i @tanstack/react-query-devtools
+  ```
+  - 개발자 도구 사용 방법 참고: <https://tanstack.com/query/latest/docs/react/devtools>
+
+#### 사용 설정
+* App.jsx에 추가
+  ```jsx
+  ......
+  import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+  import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+  const queryClient = new QueryClient();
+
+  function App() {
+    return (
+      <QueryClientProvider client={ queryClient }>    
+        ......
+        <ReactQueryDevtools initialIsOpen={ false } />
+      </QueryClientProvider>
+    );
+  }
+  ```
+
+#### useQuery
+* 서버의 데이터를 조회할 때 사용(GET)
+* 응답 받은 데이터는 캐시되며 다음번 요청시 서버에 요청하지 않고 캐시된 데이터를 반환
+* 캐시 상태
+  - fresh
+    + 쿼리 실행 후 캐시된 데이터가 오래되지 않은 상태
+    + 이때 동일한 쿼리가 다시 실행되면 서버에 요청하지 않고 캐시된 데이터를 반환
+    + staleTime 속성으로 fresh 상태를 얼마나 유지할지 설정 가능(default 0)
+  - stale
+    + fresh 상태가 지나면 캐시는 stale 상태가 됨
+    + 이때 동일한 쿼리가 다시 실행되면 일단 캐시된 데이터를 반환하고 서버에 데이터를 요청함
+    + 서버에서 데이터가 도착하면 캐시된 데이터를 교체하고 컴포넌트를 다시 렌더링 함
+
+##### API
+```jsx
+useQuery(options)
+```
+
+###### options
+* queryKey
+  - useQuery에 부여되는 고유한 Key 값(배열)
+  - 같은 queryKey로 요청한 useQuery는 동일한 요청으로 인식하며 캐시된 결과를 반환
+    
+* queryFn
+  - useQuery가 호출 되었을 때 실행될 함수이며 Promise를 반환해야 함
+  - 함수 내부에서 axios.get() 같은 함수를 리턴하도록 작성
+
+  - 사용 예시
+  ```jsx
+  // 게시물 목록 조회
+  useQuery({
+    queryKey: ['boards'],
+    queryFn: () => axios.get('/posts')
+  });
+  // 3번 게시물 상세 조회
+  useQuery({
+    queryKey: ['boards', '3'],
+    queryFn: () => axios.get('/posts/3')
+  });
+  // 3번 게시물 댓글 목록 조회
+   useQuery({
+    queryKey: ['boards', '3', 'replies'],
+    queryFn: () => axios.get('/posts/3/replies')
+  });
+  ```
+
+* staleTime: 조회한 데이터가 fresh에서 stale 상태로 변경되는데 걸리는 시간(default 0). fresh 상태에서는 동일한 요청에 대해 서버에 요청을 보내지 않고 캐시된 데이터를 반환
+* gcTime: 캐시된 데이터가 얼마동안 사용되지 않으면 제거할지 지정(default 5분)
+* refetchOnMount: 데이터가 stale 상태일 경우 마운트 시 마다 재요청을 할지 여부(default true). "always"로 지정할 경우 fresh 상태일때도 마운트 시 마다 재요청 함.
+* refetchOnWindowFocus: 브라우저가 화면에서 보이지 않다가 다시 보이는 경우 재요청을 할 것인지 여부(default true). "always"로 지정하면 fresh 상태에서도 윈도우 포커싱이 될 때마다 재요청
+* enabled: false일 경우 쿼리를 실행하지 않음(default true)
+* retry: 실패한 쿼리를 재시도 할지 여부나 횟수(default 3)
+  - true: 무한 재시도
+  - false: 재시도 하지 않음
+  - 정수: 재시도 횟수
+* suspense: suspense mode 활성화 여부(default false). suspense mode가 활성화 될 경우 React의 Suspense와 함께 사용 가능
+* 그밖의 옵션 참고: <https://tanstack.com/query/latest/docs/react/reference/useQuery>
+
+###### 리턴값
+* 다음의 속성을 가진 객체
+  - isLoading: queryFn이 반환한 Promise가 pending 상태일때 true. queryFn이 axios를 사용한 함수라면 데이터 로딩중일때 true
+  - error: queryFn이 반환한 Promise가 rejected 상태일때 에러 메세지. queryFn이 axios를 사용한 함수라면 에러가 발생했을때 에러 메세지
+  - data: queryFn이 반환한 Promise가 fulfilled 상태일때 응답 데이터. queryFn이 axios를 사용한 함수라면 요청에 성공했을때 응답 데이터
+  - 그밖의 속성 참고: <https://tanstack.com/query/latest/docs/react/reference>
+
+#### useMutation
+* 서버의 데이터를 변경할 때 사용(POST, PUT, PATCH, DELETE)
+* useMutation은 React Hook이므로 컴포넌트 루트에서만 사용할 수 있고 대부분의 경우 서버의 데이터를 변경하는 작업은(등록, 수정, 삭제) 사용자의 액션에 의해서 실행 되기 때문에 mutationFn이 호출되는 위치는 이벤트 핸들러 내부이므로 컴포넌트 루트가 아님
+* useMutation은 쿼리를 바로 실행하지 않고 쿼리를 실행 할때 사용할 함수를 반환하므로 이벤트 핸들러 내에서 useMutation이 반환한 함수를 통해 쿼리 실행
+
+##### API
+```jsx
+useMutation(options)
+```
+
+###### options
+* mutationFn
+  - useMutation이 반환한 mutate 함수가 호출 되었을 때 실행될 함수이며 Promise를 반환해야 함
+  - 함수 내부에서 axios.post() 같은 함수를 리턴하도록 작성
+* gcTime, retry: useQuery 설명 참조
+* onSuccess: 쿼리 성공 시 실행되는 함수. 매개변수로 서버의 응답값이 전달됨
+* onError: 쿼리 실패 시 실행되는 함수. 매개변수로 에러값이 전달됨
+* onSettled: 쿼리 성공, 실패와 상관 없이 실행되는 함수. 매개변수는 data, error
+  - onSuccess, onError, onSettled는 useMutation 뿐만 아니라 mutate 함수의 옵션으로도 사용 가능
+* 그밖의 옵션 참고: <https://tanstack.com/query/latest/docs/react/reference/useMutation>
+
+###### 리턴값
+* 다음의 속성을 가진 객체
+  - mutate: 이벤트 핸들러 내부에서 mutate를 호출하면 mutationFn이 호출되면서 실제 비동기 요청이 발생함
+  - isLoading, error, data: useQuery 설명 참조
+  - 그밖의 속성 참고: <https://tanstack.com/query/latest/docs/react/reference/useMutation>
+
+###### invalidateQueries
+* useQuery에서 사용된 queryKey를 지정해서 해당 쿼리를 무효화 시키고 데이터를 다시 가져옴
+* 사용 예시
+  ```jsx
+  const queryClient = useQueryClient();
+  // 새로운 댓글 작성시 3번 게시물의 댓글 목록을 무효화 시키고 서버에서 다시 가져옴
+  queryClient.invalidateQueries(['boards', 3, 'comments'])
+  ```
+* 참고: <https://tanstack.com/query/latest/docs/react/reference/QueryClient#queryclientinvalidatequeries>
