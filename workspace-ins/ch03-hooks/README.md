@@ -137,6 +137,53 @@ const ref = useRef(initialValue);
 #### 리턴값
 * `current`라는 상태값 또는 DOM 요소가 있는 속성 하나가 정의된 객체
 
+### input 요소의 값 지정: useState vs. useRef
+#### useState 사용
+* value 속성으로 상태값 지정
+* 리액트에서 직접 상태관리를 하는 제어 컴포넌트를 구현
+* input 값이 변경되는 즉시 리렌더링 되어야 할때
+  - 리렌더링이 자주 되므로 오버헤드 발생
+
+##### 예시
+```jsx
+function App(){
+  const [msg, setMsg] = useState('');
+  return (
+    <>
+      <h1>01 useState - 상태 관리</h1>
+      <div>
+        <input type="text" value={ msg } onChange={ e => setMsg(e.target.value) } />
+        <br/>
+        <span>입력 메세지: { msg }</span>
+      </div>
+    </>
+  );
+}
+```
+
+#### useRef 사용
+* defaultValue 속성으로 초기값 지정
+* 브라우저에서 입력값을 관리하는 비제어 컴포넌트를 구현
+* input 값이 변경 되어도 리렌더링 될 필요가 없을때
+  - 리렌더링이 되지 않으므로 성능 최적화
+
+##### 예시
+```jsx
+function Counter() {
+  const step = useRef(1);
+
+  return (
+    <div id="counter">
+      <input type="number" defaultValue={ step.current } onChange={ e => step.current = Number(e.target.value) } />
+      <Button color="red">-</Button>
+      <Button>0</Button>
+      <Button color="blue">+</Button>
+      <span>0</span>
+    </div>
+  );
+}
+```
+
 ## useMemo
 - 지정한 함수를 호출하여 반환받은 결과값을 내부에 저장(캐싱)하는 함수
 

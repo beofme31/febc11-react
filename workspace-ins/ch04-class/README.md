@@ -18,7 +18,7 @@
   ```js
   constructor(props){
     super(props);
-    this.state = { count: 0 };
+    this.state = { count: props.level };
   }
   ```
 

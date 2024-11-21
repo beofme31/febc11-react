@@ -1,7 +1,7 @@
 function Header(){
   return (
     <header>
-      <h1>Todo List - 01 TodoContainer 추가 :()</h1>
+      <h1>03 useReducer - 상태 관리 로직을 한곳에서</h1>
     </header>
   );
 }
