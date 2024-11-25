@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Link, Outlet, useParams } from "react-router-dom";
 
 function TodoDetail() {
   const { _id } = useParams();
@@ -22,9 +22,12 @@ function TodoDetail() {
         <div>
           수정일 : 2024.11.25 13:45:12
         </div>
-        <a href="./todoedit.html">수정</a>
-        <a href="./todolist.html">목록</a>
+        <Link to="./edit">수정</Link>
+        {/* <Link to={`/list/${_id}/edit`}>수정</Link> */}
+        <Link to="/list">목록</Link>
       </div>
+
+      <Outlet />
     </div>
   );
 }
