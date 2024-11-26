@@ -1,5 +1,4 @@
 # 9장 HTTP 통신과 Ajax
-* 소스 코드(GitHub): <https://github.com/uzoolove/febc11-react/tree/main/workspace-ins/ch09-ajax>
 * 코드 실행(GitHub Page): <https://uzoolove.github.io/febc11-react/workspace-ins/index.html#09>
 
 ## HTTP
@@ -76,6 +75,203 @@ HTTP/2와 HTTP/3는 기존 HTTP/1.x의 비효율성을 개선하기 위해 다�
   - 할일 삭제
   - 회원 삭제
 
+## API 테스트
+### Postman
+* https://www.postman.com/downloads 접속 후 다운로드
+- 본인의 OS에 맞는 버전 다운로드 후 기본 설정으로 설치
+
+### Todo List API 테스트
+#### Workspace 생성
+* Workspaces > Create Workspace
+  - Blank Workspace > Next
+  - Name: `FEBC11` > Create
+
+#### 환경 변수 추가
+- Environments > + 버튼(Create new environment) 
+- "New Environment" -> `Todo List`로 수정
+
+##### url 추가
+- Variable: url
+- Type: default
+- initial value: `https://todo-api.fesp.shop`
+- Ctrl + S 눌러서 저장
+
+#### Collection 추가
+* Collections > + 버튼(Create new collection) > Blank collection
+  - "New Collection" -> `Todo API`로 수정
+
+#### API Server 환경 변수 지정
+* 우측 상단의 "No Environment" 클릭 후 Todo List 선택
+
+#### Todo API Collection에 API 요청 추가(할일 목록 조회)
+* Collections > Todo API 컬렉션 위에 마우스 올린 후 ··· 클릭해서 Add request 선택
+  - "New Request" -> `할일 목록 조회`로 수정
+  - "Enter URL or paste text" 항목에 `{{url}}/todolist` 입력 후 Send
+  - 응답 결과 확인
+
+#### 할일 등록
+* Collections > Todo API 컬렉션 위에 마우스 올린 후 ··· 클릭해서 Add request 선택
+  - `Todo API/할일 등록`
+  - "GET" -> `POST`로 수정
+  - `{{url}}/todolist`
+  - Body > raw > "Text" -> "JSON"으로 변경. 데이터 입력 후 Send
+  ```json
+  {
+    "title": "GD의 TodoList - API 테스트",
+    "content": "API 테스트 잘되는지 확인"
+  }
+  ```
+
+#### 할일 상세 조회
+- `Todo API/할일 상세 조회`
+- `GET`, `{{url}}/todolist/5`
+
+#### 할일 완료
+- `Todo API/할일 완료`
+- `PATCH`, `{{url}}/todolist/5`
+- Body > raw > "Text" -> "JSON"으로 변경. 데이터 입력 후 Send
+```json
+{
+  "done": true
+}
+```
+
+#### 할일 내용 수정
+- `Todo API/할일 내용 수정`
+- `PATCH`, `{{url}}/todolist/5`
+- Body > raw > "Text" -> "JSON"으로 변경. 데이터 입력 후 Send
+```json
+{
+  "title": "GD의 TodoList - 수정",
+  "content": "API 수정 잘되는지 확인"
+}
+```
+
+#### 할일 삭제
+- `Todo API/할일 삭제`
+- `DELETE`, `{{url}}/todolist/5`
+
+### Open Market API 테스트
+
+#### 환경 변수 추가
+- Environments > + 버튼(Create new environment) 
+- "New Environment" -> `Open Market`으로 수정
+
+##### url 추가
+- Variable: url
+- Type: default
+- initial value: `https://11.fesp.shop`
+- Ctrl + S 눌러서 저장
+
+##### client-id 추가
+- Variable: client-id
+- Type: default
+- initial value: `00-nike`
+- Ctrl + S 눌러서 저장
+
+#### Collection 추가
+* Collections > + 버튼(Create new collection) > Blank collection
+  - "New Collection" -> `Open Market API`로 수정
+
+#### API Server 환경 변수 지정
+* 우측 상단의 "No Environment" 클릭 후 `Open Market` 선택
+
+#### Open Market API Collection에 API 요청 추가(상품 목록 조회)
+* Collections > Open Market API 컬렉션 위에 마우스 올린 후 ··· 클릭해서 Add request 선택
+  - "New Request" -> `상품 목록 조회`로 수정
+  - "Enter URL or paste text" 항목에 `{{url}}/products` 입력 후 Send
+  - 응답 결과 확인
+  ```json
+  {
+    "ok": 0,
+    "message": "client-id 헤더가 없습니다."
+  }
+  ```
+* client-id 헤더 추가
+  - Headers 탭 선택
+    - Key: `client-id`
+    - Value: `{{client-id}}`
+
+#### 상품 상세 조회
+* Collections > Open Market API 컬렉션 위에 마우스 올린 후 ··· 클릭해서 Add request 선택
+  - `Open Market API/상품 상세 조회`
+  - `{{url}}/products/4`
+  - 응답 결과 확인
+  ```json
+  {
+    "ok": 0,
+    "message": "client-id 헤더가 없습니다."
+  }
+  ```
+* 컬렉션내의 모든 요청에 client-id 헤더 추가
+  - Collections > Open Market API 선택
+  - Scripts > Pre-request 선택 후 추가
+  ```js
+  pm.request.headers.add({
+    key: "client-id",
+    value: "{{client-id}}"
+  });
+  ```
+  - Ctrl + S 눌러서 저장
+
+#### 회원 정보 조회
+- `Open Market API/회원 정보 조회`
+- `GET`, `{{url}}/users/4`
+
+#### 회원 정보 수정
+- `Open Market API/회원 정보 수정`
+- `PATCH`, `{{url}}/users/4`
+- Body > raw > "Text" -> "JSON"으로 변경. 데이터 입력 후 Send
+```json
+{
+  "name": "제이미"
+}
+```
+- 응답 결과 확인
+```json
+{
+    "ok": 0,
+    "message": "authorization 헤더가 없습니다.",
+    "errorName": "EmptyAuthorization"
+}
+```
+
+#### 로그인
+- `Open Market API/로그인`
+- `POST`, `{{url}}/users/login`
+- Body > raw > "Text" -> "JSON"으로 변경. 데이터 입력 후 Send
+```json
+{
+  "email": "u1@gmail.com",
+  "password": "11111111"
+}
+```
+
+##### 로그인 응답 결과로 받은 토큰을 환경 변수에 세팅
+* Collections > Open Market API > 로그인 > Scripts > Post-response
+  ```js
+  if (pm.response.code === 200) {
+    const jsonData = pm.response.json();
+    const accessToken = jsonData.item.token.accessToken;
+    const refreshToken = jsonData.item.token.refreshToken;
+    pm.environment.set("accessToken", accessToken);
+    pm.environment.set("refreshToken", refreshToken);
+  }
+  ```
+* Environments > Open Market 환경 변수에 accessToken과 refreshToken 추가 되었는지 확인
+
+##### 회원 정보 수정 요청 헤더에 토큰 인증 정보 추가
+* Collections > Open Market API > 회원 정보 수정 > Authorization
+  - Auth Type: Bearer Token
+  - Token: `{{accessToken}}`
+  - Send
+  - 정상 응답 결과 확인
+
+##### 컬렉션내의 모든 요청에 토큰 인증 정보 추가
+* Collections > Open Market API > Authorization
+  - Auth Type: Bearer Token
+  - Token: `{{accessToken}}`
+  - Ctrl + S 눌러서 저장
 
 ## Ajax
 
@@ -469,3 +665,5 @@ useMutation(options)
   queryClient.invalidateQueries(['boards', 3, 'comments'])
   ```
 * 참고: <https://tanstack.com/query/latest/docs/react/reference/QueryClient#queryclientinvalidatequeries>
+
+

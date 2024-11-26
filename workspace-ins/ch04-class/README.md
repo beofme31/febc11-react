@@ -1,5 +1,4 @@
 # 4장 클래스 컴포넌트와 컴포넌트의 라이프 사이클
-* 소스 코드(GitHub): <https://github.com/uzoolove/febc11-react/tree/main/workspace-ins/ch04-class>
 * 코드 실행(GitHub Page): <https://uzoolove.github.io/febc11-react/workspace-ins/index.html#04>
 
 ## 컴포넌트 생명 주기

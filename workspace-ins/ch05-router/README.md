@@ -1,5 +1,4 @@
 # 5장 리액트 라우터
-* 소스 코드(GitHub): <https://github.com/uzoolove/febc11-react/tree/main/workspace-ins/ch05-router>
 * 코드 실행(GitHub Page): <https://uzoolove.github.io/febc11-react/workspace-ins/index.html#05>
 
 ## 클라이언트 측 라우팅이란?
