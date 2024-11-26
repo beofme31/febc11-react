@@ -8,7 +8,7 @@ function Layout() {
 
       <Header />
 
-      <Outlet />
+      <Outlet context={{ hello: 'world' }} />
 
       <Footer />
 
