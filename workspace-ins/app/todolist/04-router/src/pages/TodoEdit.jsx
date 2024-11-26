@@ -17,7 +17,9 @@ function TodoEdit() {
       alert('할일이 수정 되었습니다.');
 
       // 할일 상세보기로 이동
-
+      // navigate('..', { relative: true }); // 상대 경로로 이동
+      // navigate(`/list/${ item._id }`, { replace: true }); // window.history.replaceState()
+      navigate(-1); // window.history.back(-1)
     }catch(err){
       console.error(err);
       alert('할일 수정에 실패했습니다.');
