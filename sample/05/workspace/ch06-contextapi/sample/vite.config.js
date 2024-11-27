@@ -11,6 +11,8 @@ export default defineConfig({
       { find: "@pages", replacement: "/src/pages" },
       { find: "@hooks", replacement: "/src/hooks" },
       { find: "@context", replacement: "/src/context" },
+      { find: "@redux", replacement: "/src/redux" },
+      { find: "@redux-toolkit", replacement: "/src/redux-toolkit" },
     ],
   },
 })
