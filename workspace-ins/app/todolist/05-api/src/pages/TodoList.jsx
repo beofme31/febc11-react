@@ -1,8 +1,8 @@
 import useAxiosInstance from "@hooks/useAxiosInstance";
-import useFetch from "@hooks/useFetch";
 import TodoListItem from "@pages/TodoListItem";
 import { useEffect, useRef, useState } from "react";
 import { Link, Outlet, useSearchParams } from "react-router-dom";
+import '../Pagination.css';
 
 // const dummyData = {
 //   items: [{
@@ -26,7 +26,8 @@ function TodoList() {
 
   const params = {
     keyword: searchParams.get('keyword'),
-    // page: searchParams.get('page'),
+    page: searchParams.get('page'),
+    limit: 5,
   };
 
   // useEffect(() => {
@@ -47,7 +48,7 @@ function TodoList() {
 
   useEffect(() => {
     fetchList();
-  }, []);
+  }, [searchParams]); // 최초 마운트 후에 호출
 
   // 삭제 작업
   const handleDelete = async (_id) => {
@@ -65,16 +66,25 @@ function TodoList() {
   };
 
   const itemList = data?.items.map(item => <TodoListItem key={ item._id } item={ item } handleDelete={ handleDelete } />);
-
-
   
   // 검색
   const handleSearch = (e) => {
     e.preventDefault();
-    const inputKeyword = searchRef.current.value;
-    console.log(inputKeyword);
-
+    setSearchParams(new URLSearchParams(`keyword=${searchRef.current.value}`));
   };
+
+
+  const current = params.page;
+
+  let pageList = [];  
+  for(let page=1; page<=data?.pagination.totalPages; page++){
+    searchParams.set('page', page);  
+    // keyword=환승&page=1
+    // keyword=환승&page=2
+    // keyword=환승&page=3
+    let search = searchParams.toString();
+    pageList.push(<li className={ current === page ? 'active' : '' }><Link to={`/list?${search}`}>{page}</Link></li>);
+  }
 
   return (
     <div id="main">
@@ -83,11 +93,17 @@ function TodoList() {
         <Link to="/list/add">추가</Link>
         <br/>
         <form className="search" onSubmit={ handleSearch }>
-          <input type="text" autoFocus defaultValue={'hello'} ref={ searchRef } />
+          <input type="text" autoFocus defaultValue={ params.keyword } ref={ searchRef } />
           <button type="submit">검색</button>
         </form>
         <ul className="todolist">
           { itemList }
+        </ul>
+      </div>
+
+      <div className="pagination">
+        <ul>
+          { pageList }
         </ul>
       </div>
 
