@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>실습</title>
+  <link rel="shortcut icon" href="./assets/favicon.ico">
+  <link rel="stylesheet" href="./assets/style.css">
+  <script src="https://unpkg.com/jquery@3.7.1"></script>
+  <script>
+
+    $(() => {
+      const clicked = $(`.paragraph > ul a[href*="${history.state?.link}"]`);
+      clicked.addClass('clicked');
+
+      const chapter = location.hash?.substring(1);
+      $('#chapter-' + chapter).addClass('chapter-open');
+
+      setTimeout(() => {
+        if(clicked[0]){
+          const elementRect = clicked[0].getBoundingClientRect();
+          const offset = clicked[0] ? elementRect.top - (window.innerHeight / 2 - elementRect.height / 2) : 0;
+          window.scrollBy({ top: offset, behavior: 'smooth' });
+        }else{
+          document.querySelector('#chapter-'+chapter)?.scrollIntoView({
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
+      
+    });
+
+    $(() => {
+      $('.chapter-title').click(function(){
+        if ($(this).parent().toggleClass('chapter-open').hasClass('chapter-open')) {
+          $(this).children('button').text('예제목록 접기');
+        }else{
+          $(this).children('button').text('예제 목록 펼치기');
+        }
+      });
+    });
+
+    $(() => {
+      $('.paragraph > ul a').click(function(){
+        console.log($(this).parents('.chapter'));
+        const chapter = $(this).parents('.chapter').attr('id')?.split('-').pop();
+        const newUrl = `${location.origin}${location.pathname}#${chapter}`;
+        history.replaceState({ link: $(this).attr('href') }, '', newUrl);
+      });
+    });
+
+    $(() => {
+      $('.paragraph > ul a').click(function(e) {
+        $('.paragraph > ul a').removeClass('clicked');
+        $(this).addClass('clicked');
+        var url = $(this).attr('href');
+        var extName = url.split('.').pop();
+        if (extName == 'js') {
+          e.preventDefault();
+          console.clear();
+          var title = $(this).text();
+          console.log('<<< ' + title + ' 예제 실행 결과(' + url + ') >>>');
+          $.get(url, data => {
+            if (data.trim) {
+              data = data.trim();
+            }
+            console.log(data);
+            console.log('\n\n');
+            $('body').next().remove();
+            var result = '<script>' + data + '<\/script>';
+              $('html').append(result);
+          }, 'text');
+        }
+      });
+    });
+  </script>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="example-title">React 실습</h1>
+    </header>
+    <div class="main-contents">
+
+      <section id="chapter-app" class="chapter">
+        <div class="chapter-title">
+        	<h3 tabindex="0">App</h3>
+        	<button>예제 목록 펼치기</button>
+        </div>
+        <section class="paragraph">
+          <h4 class="paragraph-title">Todo List</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=app/todolist/01-container">01 컨테이너 컴포넌트 추가</a></li>
+            <li><a href="run-react.html?filepath=app/todolist/02-reduce">02 TodoReducer에서 상태 관리 로직 작성, useRef로 input 요소에 포커스 추가</a></li>
+            <li><a href="run-react.html?filepath=app/todolist/03-memo">03 React.memo, useCallback으로 메모이제이션</a></li>
+            <li><a href="run-react.html?filepath=app/todolist/04-router">04 리액트 라우터 적용</a></li>
+            <li><a href="run-react.html?filepath=app/todolist/05-api">05 API 서버 연동</a></li>
+            <li><a href="run-react.html?filepath=app/todolist/06-globalstate">06 전역 상태 관리</a></li>
+          </ul>
+        </section>
+      </section>
+      
+      <section id="chapter-01" class="chapter">
+        <div class="chapter-title">
+        	<h3 tabindex="0">1장 리액트 빌드업</h3>
+        	<button>예제 목록 펼치기</button>
+        </div>
+        <section class="paragraph">
+          <h4 class="paragraph-title">1-1 웹 개발의 변천사</h4>
+          <ul>
+            <li>고전적인 방식 (서버에서 완성된 HTML 응답)
+              <ul>
+                <li><a href="https://todo.fesp.shop">01 Todo List</a></li>
+              </ul>
+            </li>
+            <li>근대적인 방식 (Multi Page Application, MPA)
+              <ul>
+                <li>Todo List (HTML + vanillaJS)
+                  <ul>
+                    <li><a href="ch01-buildup/todolist/sample/">Sample</a></li>
+                    <li><a href="ch01-buildup/todolist/01/">01 목록 조회</a></li>
+                    <li><a href="ch01-buildup/todolist/02/">02 등록</a></li>
+                    <li><a href="ch01-buildup/todolist/03/">03 수정</a></li>
+                    <li><a href="ch01-buildup/todolist/04/">04 삭제, 완성</a></li>
+                  </ul>
+                </li>
+                <li>Todo List (HTML + jQuery)
+                  <ul>
+                    <li><a href="ch01-buildup/todolist/05/">05 jQuery</a></li>
+                  </ul>
+                </li>
+                <li>Counter (라이브러리 개발)
+                  <ul>
+                    <li><a href="ch01-buildup/counter/sample/">Sample</a></li>
+                    <li><a href="ch01-buildup/counter/01/">01 HTML + JS</a></li>
+                    <li><a href="ch01-buildup/counter/02/">02 HTML 대신 JS로 UI 구성</a></li>
+                    <li><a href="ch01-buildup/counter/03/">03 createElement() 함수 만들기</a></li>
+                    <li><a href="ch01-buildup/counter/04/">04 createRoot(), render() 함수 만들기</a></li>
+                    <li><a href="ch01-buildup/counter/05/">05 UI 구성 요소별 각각의 함수로 분리(컴포넌트로 만들기)</a></li>
+                    <li><a href="ch01-buildup/counter/06/">06 상태(데이터) 변경시 자동으로 UI 리렌더링</a></li>
+                    <li><a href="ch01-buildup/counter/07/">07 컴포넌트를 모듈로 분리</a></li>
+                  </ul>
+                </li>
+                <li>Todo List (vanillaJS + Lib)
+                  <ul>
+                    <li><a href="ch01-buildup/todolist/06/">06 Mylib.createElement() 사용해서 UI 구성</a></li>
+                    <li><a href="ch01-buildup/todolist/07/">07 UI 구성 요소별 각각의 함수로 분리(컴포넌트로 만들기)</a></li>
+                    <li><a href="ch01-buildup/todolist/08/">08 상태(데이터) 변경시 화면 리렌더링</a></li>
+                    <li><a href="ch01-buildup/todolist/09/">09 컴포넌트를 모듈로 분리</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>현대적인 방식 (Single Page Application, SPA)
+              <ul>
+                <li><a href="ch01-buildup/react/01/">01 Counter - React</a></li>
+                <li><a href="ch01-buildup/react/02/">02 Todo List - React로 UI 구성</a></li>
+                <li><a href="ch01-buildup/react/03/">03 Todo List - React 컴포넌트 분리</a></li>
+                <li><a href="ch01-buildup/react/04/">04 Todo List - React 기능 추가</a></li>
+                <li><a href="run-react.html?filepath=ch01-buildup/react/05">05 Todo List - React 컴포넌트를 모듈로 분리</a></li>
+              </ul>
+            </li>
+          </ul>
+
+          <h4 class="paragraph-title">1-2 리액트 개발에 자주 사용하는 자바스크립트 문법</h4>
+          <ul>
+            <li><a href="ch01-buildup/js-review/01.js">01 Arrow Function</a></li>
+            <li><a href="ch01-buildup/js-review/02.js">02 구조 분해 할당(Destructuring assignment)</a></li>
+            <li>03 전개 연산자
+              <ul>
+                <li><a href="ch01-buildup/js-review/03-01.js">03-01 기본 데이터 타입과 참조형 데이터 타입</a></li>
+                <li><a href="ch01-buildup/js-review/03-02.js">03-02 객체에 적용</a></li>
+                <li><a href="ch01-buildup/js-review/03-03.js">03-03 배열에 적용</a></li>
+                <li><a href="ch01-buildup/js-review/03-04.js">03-04 전개 연산자를 이용한 얕은 복사</a></li>
+              </ul>
+            </li>
+            
+            <li><a href="ch01-buildup/js-review/04.html">04 삼항 연산자</a></li>
+            <li><a href="ch01-buildup/js-review/05/">05 module</a></li>
+            <li>06 Promise, async/await
+              <ul>
+                <li><a href="ch01-buildup/js-review/06-01.js">06-01 동기 함수 호출</a></li>
+                <li><a href="ch01-buildup/js-review/06-02.js">06-02 비동기 함수 호출</a></li>
+                <li><a href="ch01-buildup/js-review/06-03.js">06-03 callback을 이용한 비동기 함수 호출</a></li>
+                <li><a href="ch01-buildup/js-review/06-04.js">06-04 Promise를 이용한 비동기 함수 호출</a></li>
+                <li><a href="ch01-buildup/js-review/06-05.js">06-05 async/await를 이용한 Promise</a></li>
+              </ul>
+            </li>
+            <li>07 배열 메서드
+              <ul>
+                <li><a href="ch01-buildup/js-review/07-01.js">07-01 forEach</a></li>
+                <li><a href="ch01-buildup/js-review/07-02.js">07-02 map</a></li>
+                <li><a href="ch01-buildup/js-review/07-03.js">07-03 find</a></li>
+                <li><a href="ch01-buildup/js-review/07-04.js">07-04 filter</a></li>
+                <li><a href="ch01-buildup/js-review/07-05.js">07-05 reduce</a></li>
+              </ul>
+            <li><a href="ch01-buildup/js-review/08.js">08 메모이제이션</a></li>
+          </ul>
+        </section>
+      </section>
+
+      <section id="chapter-02" class="chapter">
+        <div class="chapter-title">
+        	<h3 tabindex="0">2장 리액트 시작하기</h3>
+        	<button>예제 목록 펼치기</button>
+        </div>
+        <section class="paragraph">
+          <h4 class="paragraph-title">2-1 리액트란?</h4>
+          <ul>
+            <li>Hello React
+              <ul>
+                <li><a href="ch02-start/hello/01.html">01 Hello HTML</a></li>
+                <li><a href="ch02-start/hello/02.html">02 Hello DOM</a></li>
+                <li><a href="ch02-start/hello/03.html">03 Hello React</a></li>
+                <li><a href="ch02-start/hello/04.html">04 Hello JSX with babel</a></li>
+              </ul>
+            </li>
+            <li>Simple Todo List
+              <ul>
+                <li><a href="ch02-start/todo/01.html">01 Simple Todo List - HTML</a></li>
+                <li><a href="ch02-start/todo/02.html">02 Simple Todo List - React Component</a></li>
+                <li><a href="ch02-start/todo/03.html">02 Simple Todo List - React Props</a></li>
+              </ul>
+            </li>
+          </ul>
+
+          <h4 class="paragraph-title">2-2 리액트 개발 환경 구축</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch02-start/cra">03 create-react-app (CRA)</a></li>
+            <li><a href="run-react.html?filepath=ch02-start/vite">04 Vite</a></li>
+          </ul>
+
+          <h4 class="paragraph-title">2-3 Props</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch02-start/props">01 Button 컴포넌트에 Props 전달</a></li>
+          </ul>
+
+          <h4 class="paragraph-title">2-4 State</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch02-start/state/01">01 state 대신 컴포넌트 외부의 변수 사용시 문제점</a></li>
+            <li><a href="run-react.html?filepath=ch02-start/state/02">02 이벤트 핸들러에서 state 값을 여러번 변경했을 때 문제점</a></li>
+            <li><a href="run-react.html?filepath=ch02-start/state/03">03 상태관리 대상이 객체일 경우 주의 사항</a></li>
+            <li><a href="run-react.html?filepath=ch02-start/state/04">04 상태관리 대상이 복합 객체일 경우 불변성 (feat. immer)</a></li>
+            <li><a href="run-react.html?filepath=ch02-start/state/05">05 회원가입 입력값 상태 관리</a></li>
+            <li><a href="run-react.html?filepath=ch02-start/state/06">06 회원가입 입력값 검증 (feat. react-hook-form)</a></li>
+          </ul>
+        </section>
+      </section>
+
+      <section id="chapter-03" class="chapter">
+        <div class="chapter-title">
+        	<h3 tabindex="0">3장 리액트 훅</h3>
+        	<button>예제 목록 펼치기</button>
+        </div>
+        <section class="paragraph">
+          <h4 class="paragraph-title">3-1 리액트 훅</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch03-hooks/01-useState">01 useState - 상태 관리</a></li>
+            <li><a href="run-react.html?filepath=ch03-hooks/02-useEffect">02 useEffect - side effect 관리</a></li>
+            <li><a href="run-react.html?filepath=ch03-hooks/03-useReducer">03 useReducer - 상태 관리 로직을 한곳에</a></li>
+            <li><a href="run-react.html?filepath=ch03-hooks/04-useRef">04 useRef - 데이터 관리, DOM 엘리먼트 참조</a></li>
+            <li><a href="run-react.html?filepath=ch03-hooks/05-useMemo">05 useMemo - 함수의 반환값을 memoize</a></li>
+            <li><a href="run-react.html?filepath=ch03-hooks/06-useCallback">06 useCallback(함수 자체를 memoize), React.memo(컴포넌트를 memoize)</a></li>
+          </ul>
+
+          <h4 class="paragraph-title">3-2 커스텀 훅</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch03-hooks/07-customHook">07 customHook - useCounter 커스텀 훅 사용</a></li>
+            <li><a href="run-react.html?filepath=ch03-hooks/08-customHook">08 customHook - 커스텀 훅 없이 fetch API 사용</a></li>
+            <li><a href="run-react.html?filepath=ch03-hooks/09-customHook">09 customHook - useFatch, useAxios 커스텀 훅 사용</a></li>
+          </ul>
+        </section>
+      </section>
+
+      <section id="chapter-04" class="chapter">
+        <div class="chapter-title">
+        	<h3 tabindex="0">4장 클래스 컴포넌트와 컴포넌트의 라이프 사이클</h3>
+        	<button>예제 목록 펼치기</button>
+        </div>
+        <section class="paragraph">
+          <h4 class="paragraph-title">클래스 컴포넌트</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch04-class/01">01 클래스 컴포넌트</a></li>
+            <li><a href="run-react.html?filepath=ch04-class/02">02 클래스 컴포넌트 - 함수형 컴포넌트와 같이 사용</a></li>
+            <li><a href="run-react.html?filepath=ch04-class/03">03 클래스 컴포넌트 - 컴포넌트의 라이프 사이클</a></li>
+          </ul>
+        </section>
+      </section>
+
+      <section id="chapter-05" class="chapter">
+        <div class="chapter-title">
+        	<h3 tabindex="0">5장 리액트 라우터</h3>
+        	<button>예제 목록 펼치기</button>
+        </div>
+        <section class="paragraph">
+          <h4 class="paragraph-title">리액트 라우터</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch05-router/01">01 클라이언트 라우팅 직접 구현</a></li>
+            <li><a href="run-react.html?filepath=ch05-router/02">02 리액트 라우터 사용</a></li>
+          </ul>
+        </section>
+      </section>
+
+      <section id="chapter-06" class="chapter">
+        <div class="chapter-title">
+        	<h3 tabindex="0">6장 Context API</h3>
+        	<button>예제 목록 펼치기</button>
+        </div>
+        <section class="paragraph">
+          <h4 class="paragraph-title">Context API</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch06-contextapi/before">01 Prop Drilling</a></li>
+            <li><a href="run-react.html?filepath=ch06-contextapi/after">02 Context API</a></li>
+          </ul>
+        </section>
+      </section>
+
+      <section id="chapter-07" class="chapter">
+        <div class="chapter-title">
+        	<h3 tabindex="0">7장 상태 관리 라이브러리</h3>
+        	<button>예제 목록 펼치기</button>
+        </div>
+        <section class="paragraph">
+          <h4 class="paragraph-title">7-1 Redux</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch07-globalstate/redux">01 Redux</a></li>
+          </ul>
+
+          <h4 class="paragraph-title">7-2 Recoil</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch07-globalstate/recoil">02 Recoil</a></li>
+          </ul>
+
+          <h4 class="paragraph-title">7-3 Zustand</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch07-globalstate/zustand">03 Zustand</a></li>
+          </ul>
+        </section>
+      </section>
+
+      <section id="chapter-08" class="chapter">
+        <div class="chapter-title">
+        	<h3 tabindex="0">8장 리액트에서 CSS 사용</h3>
+        	<button>예제 목록 펼치기</button>
+        </div>
+        <section class="paragraph">
+          <h4 class="paragraph-title">8-1 CSS Module</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch08-css/cssmodule">01 CSS Module</a></li>
+          </ul>
+
+          <h4 class="paragraph-title">8-2 Styled Components</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch08-css/styledcomponents">02 Styled Components</a></li>
+          </ul>
+
+          <h4 class="paragraph-title">8-3 Tailwind CSS</h4>
+          <ul>
+            <li><a href="run-react.html?filepath=ch08-css/twilwind">03 Tailwind CSS</a></li>
+          </ul>
+        </section>
+      </section>
+
+      <section id="chapter-09" class="chapter">
+        <div class="chapter-title">
+        	<h3 tabindex="0">9장 HTTP 통신과 Ajax</h3>
+        	<button>예제 목록 펼치기</button>
+        </div>
+        <section class="paragraph">
+
+        </section>
+      </section>
+
+      <section id="chapter-10" class="chapter">
+        <div class="chapter-title">
+        	<h3 tabindex="0">10장 Next.js</h3>
+        	<button>예제 목록 펼치기</button>
+        </div>
+        <section class="paragraph">
+
+        </section>
+      </section>
+
+      <section id="chapter-11" class="chapter">
+        <div class="chapter-title">
+        	<h3 tabindex="0">11장 프로젝트 준비</h3>
+        	<button>예제 목록 펼치기</button>
+        </div>
+        <section class="paragraph">
+
+        </section>
+      </section>
+
+    </div>
+    <footer class="footer">
+      <p>Copyrightⓒ Front-End BootCamp. All rights reserved.</p>
+    </footer>
+  </div>
+</body>
+</html>
