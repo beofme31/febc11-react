@@ -21,7 +21,7 @@
 ### 6장 컨텍스트 API
 * <https://github.com/uzoolove/febc11-react/tree/main/workspace-ins/ch06-contextapi>
 
-### 7장 상태 관리 라이브러리
+### 7장 전역 상태 관리
 * <https://github.com/uzoolove/febc11-react/tree/main/workspace-ins/ch07-globalstate>
 
 ### 8장 리액트에서 CSS 사용

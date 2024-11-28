@@ -9,8 +9,6 @@
       "@context/*": ["context/*"],
       "@redux/*": ["redux/*"],
       "@redux-toolkit/*": ["redux-toolkit/*"],
-      "@recoil/*": ["recoil/*"],
-      "@zustand/*": ["zustand/*"],
     }
   }
 }
