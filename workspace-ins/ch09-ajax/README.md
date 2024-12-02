@@ -349,17 +349,17 @@ async function getTodoList(){
 npm i axios
 ```
 
-#### API
+#### 요청 API
 ##### axios(url, config?), axios(config), axios.request(config)
 * 지정한 url로 HTTP 요청을 보낸다.(기본 GET 방식)
 
 * 사용 사례
   ```js
-  const itemList = await axios('https://todo-api.fesp.shop/api/todolist'); 
+  const response = await axios('https://todo-api.fesp.shop/api/todolist'); 
   ```
 
   ```js
-  const itemList = await axios('https://todo-api.fesp.shop/api/todolist', {
+  const response = await axios('https://todo-api.fesp.shop/api/todolist', {
     method: 'post',
     data: {
       title: '할일 1',
@@ -369,7 +369,7 @@ npm i axios
   ```
 
   ```js
-  const itemList = await axios({
+  const response = await axios({
     url: 'https://todo-api.fesp.shop/api/todolist/1',
     method: 'patch',
     data: {
@@ -380,52 +380,54 @@ npm i axios
   ```
 
   ```js
-  const itemList = await axios.request({
+  const response = await axios.request({
     url: 'https://todo-api.fesp.shop/api/todolist/1',
     method: 'delete'
   });
   ```
 
-* config 객체의 주요 속성
-  ```js
-  {
-    // 요청에 사용될 서버 URL
-    url: '/todolist',
+##### config 객체의 주요 속성
+```js
+{
+  // 요청에 사용될 서버 URL
+  url: '/todolist',
 
-    // 요청을 생성할때 사용되는 메소드
-    method: 'get', // 기본값
+  // 요청을 생성할때 사용되는 메소드
+  method: 'get', // 기본값
 
-    // `url`이 절대값이 아닌 경우 `baseURL`이 url 앞에 붙음
-    baseURL: 'https://todo-api.fesp.shop/api',
-    
-    // 사용자 지정 헤더
-    headers: {'Authrization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'},
+  // `url`이 절대값이 아닌 경우 `baseURL`이 url 앞에 붙음
+  baseURL: 'https://todo-api.fesp.shop/api',
+  
+  // 사용자 지정 헤더
+  headers: {'Authrization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'},
 
-    // `params`은 요청과 함께 전송되는 URL 파라미터
-    // 반드시 일반 객체나 URLSearchParams 객체여야 함
-    // 참고: null이나 undefined는 URL에 렌더링되지 않음
-    params: {
-      page: 3,
-      limit: 10
-    },
+  // `params`은 요청과 함께 전송되는 URL 파라미터(pathname? 뒤에 추가되는 name=value 쌍의 문자열)
+  // 반드시 일반 객체나 URLSearchParams 객체여야 함
+  // 참고: null이나 undefined는 URL에 렌더링되지 않음
+  params: {
+    page: 3,
+    limit: 10
+  },
 
-    // 요청 바디로 전송될 데이터
-    // 'PUT', 'POST', 'PATCH', 'DELETE' 메소드에서만 적용 가능
-    // 다음 타입 중 하나여야 함
-    // - string, plain object, ArrayBuffer, ArrayBufferView, URLSearchParams
-    // - 브라우저 전용: FormData, File, Blob
-    data: {
-      title: '10시간 푹자기',
-      content: '이번 주말에 도전해야지'
-    },
+  // 요청 바디로 전송될 데이터
+  // 'PUT', 'POST', 'PATCH', 'DELETE' 메소드에서만 적용 가능
+  // 다음 타입 중 하나여야 함
+  // - string, plain object, ArrayBuffer, ArrayBufferView, URLSearchParams
+  // - 브라우저 전용: FormData, File, Blob
+  data: {
+    title: '10시간 푹자기',
+    content: '이번 주말에 도전해야지'
+  },
 
-    // 응답이 `timeout(밀리초)`보다 오래 걸리면 요청이 중단되고 timeout 에러 발생
-    timeout: 1000, // 기본값은 `0` (타임아웃 없음)
+  // 응답이 `timeout(밀리초)`보다 오래 걸리면 요청이 중단되고 timeout 에러 발생
+  timeout: 1000, // 기본값은 `0` (타임아웃 없음)
 
-    // 자격 증명을 사용하여 사이트 간 액세스 제어 요청을 해야 하는지 여부 지정
-    withCredentials: false, // 기본값
-  }
-  ```
+  // 자격 증명을 사용하여 사이트 간 액세스 제어 요청을 해야 하는지 여부 지정
+  // 다른 도메인으로 CORS 요청시 쿠키(Cookie, Set-Cookie)가 기본으로 포함되지 않으므로 이를 사용하기 위해서는 true로 설정해야 함
+  // 서버에서도 응답헤더 Access-Control-Allow-Credentials: true 설정이 필요
+  withCredentials: false, // 기본값
+}
+```
 
 ##### HTTP 메소드별로 제공되는 함수
 * axios.get(url, config?)
@@ -478,6 +480,8 @@ npm i axios
 
 #### Axios 인스턴스
 * 지정한 config 정보로 새로운 Axios 인스턴스 생성
+
+* axios.create(config?)
 
 ##### 사용 예시
 ```js
@@ -544,7 +548,7 @@ axios.interceptors.response.use((response) => {
   ```sh
   npm i @tanstack/react-query-devtools
   ```
-  - 개발자 도구 사용 방법 참고: <https://tanstack.com/query/latest/docs/react/devtools>
+  - 개발자 도구 사용 방법 참고: https://tanstack.com/query/latest/docs/react/devtools
 
 #### 사용 설정
 * App.jsx에 추가
@@ -574,7 +578,7 @@ axios.interceptors.response.use((response) => {
     + staleTime 속성으로 fresh 상태를 얼마나 유지할지 설정 가능(default 0)
   - stale
     + fresh 상태가 지나면 캐시는 stale 상태가 됨
-    + 이때 동일한 쿼리가 다시 실행되면 일단 캐시된 데이터를 반환하고 서버에 데이터를 요청함
+    + 이때 동일한 쿼리가 다시 실행되면 일단 캐시된 데이터를 반환하고 서버에 새로운 데이터를 요청함
     + 서버에서 데이터가 도착하면 캐시된 데이터를 교체하고 컴포넌트를 다시 렌더링 함
 
 ##### API
@@ -589,24 +593,24 @@ useQuery(options)
     
 * queryFn
   - useQuery가 호출 되었을 때 실행될 함수이며 Promise를 반환해야 함
-  - 함수 내부에서 axios.get() 같은 함수를 리턴하도록 작성
+  - 함수 내부에서 axios.get() 같은 함수의 호출 결과를(Promise) 리턴하도록 작성
 
   - 사용 예시
   ```jsx
   // 게시물 목록 조회
   useQuery({
-    queryKey: ['boards'],
-    queryFn: () => axios.get('/posts')
+    queryKey: ['posts'],
+    queryFn: () => axios.get('/posts'),
   });
   // 3번 게시물 상세 조회
   useQuery({
-    queryKey: ['boards', '3'],
-    queryFn: () => axios.get('/posts/3')
+    queryKey: ['posts', '3'],
+    queryFn: () => axios.get('/posts/3'),
   });
   // 3번 게시물 댓글 목록 조회
    useQuery({
-    queryKey: ['boards', '3', 'replies'],
-    queryFn: () => axios.get('/posts/3/replies')
+    queryKey: ['posts', '3', 'replies'],
+    queryFn: () => axios.get('/posts/3/replies'),
   });
   ```
 
@@ -620,14 +624,14 @@ useQuery(options)
   - false: 재시도 하지 않음
   - 정수: 재시도 횟수
 * suspense: suspense mode 활성화 여부(default false). suspense mode가 활성화 될 경우 React의 Suspense와 함께 사용 가능
-* 그밖의 옵션 참고: <https://tanstack.com/query/latest/docs/react/reference/useQuery>
+* 그밖의 옵션 참고: https://tanstack.com/query/latest/docs/react/reference/useQuery
 
 ###### 리턴값
 * 다음의 속성을 가진 객체
   - isLoading: queryFn이 반환한 Promise가 pending 상태일때 true. queryFn이 axios를 사용한 함수라면 데이터 로딩중일때 true
   - error: queryFn이 반환한 Promise가 rejected 상태일때 에러 메세지. queryFn이 axios를 사용한 함수라면 에러가 발생했을때 에러 메세지
   - data: queryFn이 반환한 Promise가 fulfilled 상태일때 응답 데이터. queryFn이 axios를 사용한 함수라면 요청에 성공했을때 응답 데이터
-  - 그밖의 속성 참고: <https://tanstack.com/query/latest/docs/react/reference>
+  - 그밖의 속성 참고: https://tanstack.com/query/latest/docs/react/reference
 
 #### useMutation
 * 서버의 데이터를 변경할 때 사용(POST, PUT, PATCH, DELETE)
@@ -635,9 +639,7 @@ useQuery(options)
 * useMutation은 쿼리를 바로 실행하지 않고 쿼리를 실행 할때 사용할 함수를 반환하므로 이벤트 핸들러 내에서 useMutation이 반환한 함수를 통해 쿼리 실행
 
 ##### API
-```jsx
-useMutation(options)
-```
+* useMutation(options)
 
 ###### options
 * mutationFn
@@ -648,13 +650,13 @@ useMutation(options)
 * onError: 쿼리 실패 시 실행되는 함수. 매개변수로 에러값이 전달됨
 * onSettled: 쿼리 성공, 실패와 상관 없이 실행되는 함수. 매개변수는 data, error
   - onSuccess, onError, onSettled는 useMutation 뿐만 아니라 mutate 함수의 옵션으로도 사용 가능
-* 그밖의 옵션 참고: <https://tanstack.com/query/latest/docs/react/reference/useMutation>
+* 그밖의 옵션 참고: https://tanstack.com/query/latest/docs/react/reference/useMutation
 
 ###### 리턴값
 * 다음의 속성을 가진 객체
   - mutate: 이벤트 핸들러 내부에서 mutate를 호출하면 mutationFn이 호출되면서 실제 비동기 요청이 발생함
   - isLoading, error, data: useQuery 설명 참조
-  - 그밖의 속성 참고: <https://tanstack.com/query/latest/docs/react/reference/useMutation>
+  - 그밖의 속성 참고: https://tanstack.com/query/latest/docs/react/reference/useMutation
 
 ###### invalidateQueries
 * useQuery에서 사용된 queryKey를 지정해서 해당 쿼리를 무효화 시키고 데이터를 다시 가져옴
@@ -662,8 +664,8 @@ useMutation(options)
   ```jsx
   const queryClient = useQueryClient();
   // 새로운 댓글 작성시 3번 게시물의 댓글 목록을 무효화 시키고 서버에서 다시 가져옴
-  queryClient.invalidateQueries(['boards', 3, 'comments'])
+  queryClient.invalidateQueries(['posts', 3, 'comments'])
   ```
-* 참고: <https://tanstack.com/query/latest/docs/react/reference/QueryClient#queryclientinvalidatequeries>
+* 참고: https://tanstack.com/query/latest/docs/react/reference/QueryClient#queryclientinvalidatequeries
 
 

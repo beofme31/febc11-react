@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["/*"],
+      "@components/*": ["components/*"],
+      "@pages/*": ["pages/*"],
+      "@hooks/*": ["hooks/*"],
+      "@context/*": ["context/*"],
+      "@redux/*": ["redux/*"],
+      "@redux-toolkit/*": ["redux-toolkit/*"],
+      "@recoil/*": ["recoil/*"],
+      "@zustand/*": ["zustand/*"],
+      "@mobx/*": ["mobx/*"],
+    }
+  }
+}
