@@ -1,3 +1,22 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@tailwind base; /* HTML 태그의 기본 스타일을 정의(h1, p, ul, a 등) */
+@tailwind components; /* 컴포넌트 스타일을 정의. 개발자가 직접 정의해서 사용(.btn, .card, .toast 등) */
+@tailwind utilities; /* 간격, 색상, 폰트 크기, 정렬 등의 유틸리티 클래스 정의(mt-4, px-3, text-center, bg-red-500 등) */
+
+/* Tailwind CSS의 base, components, utilities 레이어 중에 base 레이어 h1 태그를 재정의 */
+@layer base {
+  h1 {
+    @apply mb-6 text-2xl font-bold
+  }
+}
+
+@layer components {
+  .btn {
+    @apply bg-gray-500 text-white px-2 py-1 ml-2 text-base hover:bg-gray-600 rounded
+  }
+  .btn-primary {
+    @apply bg-blue-500 hover:bg-blue-600
+  }
+  .btn-warn {
+    @apply bg-red-500 hover:bg-red-700
+  }
+}
