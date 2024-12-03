@@ -16,7 +16,6 @@ function App() {
     try{
       // const res = await axios.get(`/products/${_id}`, { params: { delay: 1000 } });
       const res = await axios.get(`/products/${_id}`);
-      console.log('res', res);
       setData(res.data.item); // 4번(마운트 후)
       setError(null);
     }catch(err){ // network 에러, 4xx, 5xx 응답일 경우
