@@ -325,6 +325,44 @@ async function getTodoList() {
 }
 ```
 
+#### fetch(resource, options?)
+* 지정한 resource로 HTTP 요청을 보낸다.
+* 자세한 내용: https://developer.mozilla.org/ko/docs/Web/API/Window/fetch#credentials
+
+##### resource
+- 문자열, URL 객체, Request 객체
+* 사용 사례
+  ```js
+  const request = new Request('http://example.com/todolist', options);
+  const response = await fetch(request);
+  ```
+
+##### options
+- method: 요청을 생성할때 사용되는 메소드(GET, POST 등)
+- headers: 사용자 지정 헤더
+- body: 요청 바디로 전송될 데이터
+- mode: CORS 정책
+  - cors: 기본값. CORS 요청 허용. 서버 응답에 `Access-Control-Allow-Origin` 헤더가 추가되어야 함
+  - no-cors: CORS 요청은 서버에 전송되지만 응답 본문을 텍스트나 json으로 읽을 수 없음(이미지를 바이너리로 읽는 것은 가능)
+  - same-origin: CORS 요청을 허용하지 않음. 다른 서버로 요청을 보내면 요청이 실패함
+- credentials: 자격 증명을(쿠키, HTTP 인증, TLS 클라이언트 인증서) 사용하여 사이트 간 액세스 제어 요청을 어떻게 해야 하는지 여부 지정
+  - omit: 브라우저가 요청에서 자격증명을 제외하고 Set-Cookie 헤더처럼 응답에 포함된 자격증명도 무시
+  - same-origin: 기본값. 동일 출처 요청에 대해서는 자격증명을 보내거나 받음
+  - include: CORS 요청에 대해서도 자격증명을 보내거나 받음
+- cache: HTTP 캐시와 어떻게 상호작용할지를 지정
+  - default | no-store | reload | no-cache | force-cache | only-if-cached
+  - 자세한 내용: https://developer.mozilla.org/ko/docs/Web/API/Request/cache
+- redirect: 서버의 redirect 응답에 대한 처리
+  - follow: 기본값. 자동으로 redirect 됨
+  - error: redirect 발생 시 오류와 함께 요청 중단
+  - manual: redirect 되지 않고 응답 그대로 Response 객체를 반환함. 개발자가 이후의 작업을 직접 구현
+- referrer
+- referrerPolicy
+- integrity
+- keepalive
+- signal
+- priority
+
 ### axios 라이브러리
 - Node.js와 브라우저에서 사용 가능한 Promise 기반 HTTP 클라이언트
 - XMLHttpRequest 객체를 기반으로 동작하여 Fetch API보다 호환성 좋음
@@ -422,7 +460,7 @@ npm i axios
   // 응답이 `timeout(밀리초)`보다 오래 걸리면 요청이 중단되고 timeout 에러 발생
   timeout: 1000, // 기본값은 `0` (타임아웃 없음)
 
-  // 자격 증명을 사용하여 사이트 간 액세스 제어 요청을 해야 하는지 여부 지정
+  // 자격 증명을(쿠키, HTTP 인증, TLS 클라이언트 인증서) 사용하여 사이트 간 액세스 제어 요청을 해야 하는지 여부 지정
   // 다른 도메인으로 CORS 요청시 쿠키(Cookie, Set-Cookie)가 기본으로 포함되지 않으므로 이를 사용하기 위해서는 true로 설정해야 함
   // 서버에서도 응답헤더 Access-Control-Allow-Credentials: true 설정이 필요
   withCredentials: false, // 기본값
