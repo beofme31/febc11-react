@@ -59,7 +59,7 @@ function App() {
   // return <h1></h1> // 2번(마운트)
   return (
     <>
-      <h1>01 Nike 상품 상세 조회</h1>
+      <h1>01 Nike 상품 상세 조회 - Fetch API</h1>
       { isLoading && <DotLoader /> }
       { error && <p>{ error.message }</p> }
       { data && (
