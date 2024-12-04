@@ -706,4 +706,19 @@ useQuery(options)
   ```
 * 참고: https://tanstack.com/query/latest/docs/react/reference/QueryClient#queryclientinvalidatequeries
 
+### Suspense
+* React에서 **비동기 작업이 끝날 때까지 기다렸다가** 컴포넌트를 화면에 보여주는 기능
+* 기다리는 동안에는 **"로딩 중..." 같은 대체 화면(fallback)**을 대신 보여줌
+
+#### 동작 원리(사용 방법)
+1. 비동기 통신을 사용하는 컴포넌트를 Suspense 컴포넌트로 감싼다.
+2. Suspense 컴포넌트의 fallback 속성으로 대체 UI를 지정한다.
+    ```js
+    <Suspense fallback={<div>로딩중...</div>}>
+      <AsyncComponent />
+    </Suspense>
+    ```
+3. 자식 컴포넌트(AsyncComponent)는 데이터를 로드하거나 비동기 작업을 수행하는 동안, Promise를 throw 한다.
+4. Suspense는 이 Promise를 감지하고, 자식 컴포넌트의 렌더링을 중지한 후 Suspense의 fallback UI를 렌더링한다.
+5. Promise가 resolve되면, React는 다시 자식 컴포넌트를 렌더링한다.
 
