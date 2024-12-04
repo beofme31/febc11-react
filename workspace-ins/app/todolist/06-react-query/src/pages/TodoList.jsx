@@ -35,9 +35,11 @@ function TodoList() {
   // }, [searchParams]); // 최초 마운트 후에 호출
 
   const { data, refetch } = useQuery({
-    queryKey: ['할일목록을 조회하는 쿼리'],
+    queryKey: ['todolist', params],
     queryFn: () => axios.get('/todolist', { params }),
     select: res => res.data,
+    staleTime: 1000*60, // fresh => stale 전환되는데 걸리는 시간
+    gcTime: 1000*60*5, // 캐시 제거
   });
 
   // 삭제 작업
