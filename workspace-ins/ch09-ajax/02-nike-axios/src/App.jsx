@@ -3,6 +3,8 @@ import Product from "./Product";
 import Shipping from "./Shipping";
 import { DotLoader } from 'react-spinners';
 import useAxiosInstance from "@hooks/useAxiosInstance";
+import { Slide, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [data, setData] = useState(); // 1(마운트)
@@ -15,12 +17,11 @@ function App() {
     setIsLoading(true);
     try{
       // const res = await axios.get(`/products/${_id}`, { params: { delay: 1000 } });
-      const res = await axios.get(`/products/${_id}`);
+      const res = await axios.get(`/productssdfsdfds/${_id}`);
       setData(res.data.item); // 4번(마운트 후)
       setError(null);
     }catch(err){ // network 에러, 4xx, 5xx 응답일 경우
-      console.error(err);
-      setError({ message: '잠시 후 다시 요청하세요.'});
+      setError(err);
       setData(null);
     }finally{
       setIsLoading(false);
@@ -52,7 +53,7 @@ function App() {
     <>
       <h1>02 Nike 상품 상세 조회 - Axios</h1>
       { isLoading && <DotLoader /> }
-      { error && <p>{ error.message }</p> }
+      {/* { error && <p>{ error.message }</p> } */}
       { data && (
         <div>
           <Product product={ data } />
@@ -67,6 +68,19 @@ function App() {
           <Shipping fees={ shippingFees } handlePayment={ handlePayment } />
         </div>
       ) }
+      <ToastContainer 
+        position="top-center"
+        autoClose={1000}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        transition={Slide}
+      />
     </>
   );
 }
