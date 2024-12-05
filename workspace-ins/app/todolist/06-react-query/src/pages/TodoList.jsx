@@ -18,7 +18,7 @@ function TodoList() {
   const params = {
     keyword: searchParams.get('keyword') || '',
     page: searchParams.get('page') || 1,
-    limit: 5,
+    limit: 20,
   };
 
   // axios 인스턴스

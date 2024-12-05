@@ -706,7 +706,197 @@ useQuery(options)
   ```
 * 참고: https://tanstack.com/query/latest/docs/react/reference/QueryClient#queryclientinvalidatequeries
 
-### Suspense
+## 데이터 패칭 패턴
+* 컴포넌트 렌더링과 비동기 데이터 로드 간의 관계를 정의하는 패턴으로 각 패턴은 데이터 요청과 UI 렌더링의 타이밍을 다르게 처리함
+
+### Fetch-on-render
+* 컴포넌트가 렌더링 된 후 데이터 패칭
+
+#### 흐름
+1. 컴포넌트가 처음 렌더링될 때 데이터가 보여질 영역을 비운채로 렌더링
+2. useEffect 훅에서 데이터 패칭 요청
+3. 데이터가 도착하면 상태를 업데이트해서 응답 받은 데이터를 가지고 리렌더링
+4. 자식 컴포넌트가 있다면 자식 컴포넌트도 1 ~ 3 순서로 작업
+
+#### 장점
+* 코드가 간결하고 직관적
+* 각 컴포넌트가 독립적으로 동작해서 재사용성이 높음
+
+#### 단점
+* 페이지 렌더링과 데이터 요청이 순차적으로 발생하여 폭포수 현상 발생
+* 부모와 자식이 동일한 데이터를 요청할 경우 네트워크 요청이 중복될 수 있음
+
+#### 샘플 코드
+```jsx
+import axios from "axios";
+import { useEffect, useState } from "react";
+
+// 게시글 조회 API 호출
+function fetchPost() {
+  return axios.get('https://11.fesp.shop/posts/1?delay=3000', {
+    headers: {
+      'client-id': '00-brunch'
+    }
+  });
+}
+
+// 게시글 상세 조회 페이지
+function FetchOnRender() {
+  const [data, setData] = useState();
+
+  useEffect(() => {
+    fetchPost().then(res => {
+      setData(res.data);
+    });
+  }, []);
+
+  if(!data){
+    return <div>1번 게시물 로딩중...</div>;
+  }
+
+  return (
+    <>
+      <h4>{data.item.title}</h4>
+      <Comments />
+    </>
+  );
+}
+
+// 댓글 목록 조회 화면
+function fetchComments() {
+  return axios.get('https://11.fesp.shop/posts/1/replies?delay=2000', {
+    headers: {
+      'client-id': '00-brunch'
+    }
+  });
+}
+
+// 댓글 목록 조회 API 호출
+export function Comments() {
+  const [data, setData] = useState();
+
+  useEffect(() => {
+    fetchComments().then(res => {
+      setData(res.data);
+    });
+  }, []);
+
+  if(!data){
+    return <div>댓글 로딩중...</div>;
+  }
+
+  const list = data.item.map((item) => <li key={item._id}>{item.content}</li>);
+
+  return (
+    <>
+      <ul>{ list }</ul>
+    </>
+  );
+}
+
+export default FetchOnRender;
+```
+
+### Fetch-then-render
+* 필요한 데이터를 모두 패칭한 후 컴포넌트 렌더링
+
+#### 흐름
+1. 컴포넌트가 처음 렌더링될 때 데이터가 보여질 영역을 비운채로 렌더링
+2. useEffect 훅에서 데이터 패칭 요청(자식 컴포넌트에서 필요한 데이터도 동시에 패칭)
+3. 데이터가 도착하면 상태를 업데이트해서 응답 받은 데이터를 가지고 리렌더링
+4. 자식 컴포넌트가 있다면 Props로 데이터 전달. 자식 컴포넌트는 데이터 패칭 없이 바로 렌더링
+
+#### 장점
+* 데이터를 미리 패칭하여 컴포넌트가 렌더링 되는 시점에 로딩 상태가 없거나 짧음
+* 부모가 데이터를 미리 가져와서 자식에게 전달하므로 네트워크 중복 요청 방지
+
+#### 단점
+* 렌더링 전에 데이터를 요청하기 때문에 초기 로딩이 길어질 수 있음
+* 부모 컴포넌트가 자식 컴포넌트의 의존성을 모두 관리해야 하므로 복잡성이 증가
+
+#### 샘플 코드
+```jsx
+import axios from "axios";
+import { useEffect, useState } from "react";
+
+// 게시글과 댓글 목록 조회를 동시에
+function fetchData(){
+  return Promise.all([
+    fetchPost(),
+    fetchComments(),
+  ]).then(([ post, comments ]) => {
+    return { post: post.data, comments: comments.data };
+  });
+}
+
+// 데이터 패칭 시작(렌더링 전에 부모 컴포넌트에서 import하는 순간에 실행)
+const promise = fetchData();
+
+// 게시글 조회 API 호출
+function fetchPost() {
+  return axios.get('https://11.fesp.shop/posts/1?delay=3000', {
+    headers: {
+      'client-id': '00-brunch'
+    }
+  });
+}
+
+// 게시글 상세 조회 페이지
+function FetchThenRender() {
+  const [post, setPost] = useState();
+  const [comments, setComments] = useState();
+
+  useEffect(() => {
+    promise.then(res => {
+      setPost(res.post);
+      setComments(res.comments);
+    });
+  }, []);
+
+  if(!post){
+    return <div>1번 게시물 로딩중...</div>;
+  }
+
+  return (
+    <>
+      <h4>{post.item.title}</h4>
+      <Comments comments={comments}/>
+    </>
+  );
+}
+
+// 댓글 목록 조회 화면
+function fetchComments() {
+  return axios.get('https://11.fesp.shop/posts/1/replies?delay=2000', {
+    headers: {
+      'client-id': '00-brunch'
+    }
+  });
+}
+
+// 댓글 목록 조회 API 호출
+export function Comments({ comments }) {
+  if(!comments){
+    return <div>댓글 로딩중...</div>;
+  }
+
+  const list = comments.item.map((item) => <li key={item._id}>{item.content}</li>);
+
+  return (
+    <>
+      <ul>{ list }</ul>
+    </>
+  );
+}
+
+export default FetchThenRender;
+```
+
+### Render-as-you-fetch
+* React의 Suspense 컴포넌트를 사용
+* 데이터 패칭과 동시에 컴포넌트 렌더링
+
+#### Suspense
 * React에서 **비동기 작업이 끝날 때까지 기다렸다가** 컴포넌트를 화면에 보여주는 기능
 * 기다리는 동안에는 **"로딩 중..." 같은 대체 화면(fallback)**을 대신 보여줌
 
@@ -719,6 +909,78 @@ useQuery(options)
     </Suspense>
     ```
 3. 자식 컴포넌트(AsyncComponent)는 데이터를 로드하거나 비동기 작업을 수행하는 동안, Promise를 throw 한다.
+  - React Query, SWR 등의 라이브러리에는 이미 이 동작이 구현되어 있음
 4. Suspense는 이 Promise를 감지하고, 자식 컴포넌트의 렌더링을 중지한 후 Suspense의 fallback UI를 렌더링한다.
-5. Promise가 resolve되면, React는 다시 자식 컴포넌트를 렌더링한다.
+5. Suspense는 자식 컴포넌트에서 반환받은 Promise가 Fulfilled 상태로 전환되면, 자식 컴포넌트를 리렌더링한다.
+
+#### 장점
+* 데이터 요청과 컴포넌트 렌더링이 병렬로 진행되어 성능 최적화
+* Suspense를 사용해 비동기 로직이 간결해짐
+
+#### 단점
+* Suspense 컴포넌트를 추가적으로 감싸는 부분이 복잡해 질 수 있음
+* Suspense와 함께 동작하는 비동기 로직을 직접 작성하기가 복잡해서 외부 라이브러리(React Query, SWR 등)를 사용해야 할 수 있음
+  - React 18 버전에 실험적 기능인 use() 훅으로 사용 가능
+
+#### 코드 샘플
+```jsx
+import { useSuspenseQuery } from "@tanstack/react-query";
+import axios from "axios";
+
+// 게시글 조회 API 호출
+function fetchPost() {
+  return axios.get('https://11.fesp.shop/posts/1?delay=3000', {
+    headers: {
+      'client-id': '00-brunch'
+    }
+  });
+}
+
+// 게시글 상세 조회 페이지
+function FetchAsYouRender() {
+  // React Query 사용
+  const { data } = useSuspenseQuery({
+    queryKey: ['posts', 1],
+    queryFn: () => fetchPost(),
+    select: res => res.data,
+    staleTime: 1000*10,
+  });
+
+  return (
+    <>
+      <h4>{data.item.title}</h4>
+    </>
+  );
+}
+
+// 댓글 조회 API 호출
+function fetchComments() {
+  return axios.get('https://11.fesp.shop/posts/1/replies?delay=2000', {
+    headers: {
+      'client-id': '00-brunch'
+    }
+  });
+}
+
+// 댓글 목록 조회 화면
+export function Comments() {
+  const { data } = useSuspenseQuery({
+    queryKey: ['posts', 1, 'replies'],
+    queryFn: () => fetchComments(),
+    select: res => res.data,
+    staleTime: 1000*10,
+  });
+  
+  const list = data.item.map((item) => <li key={item._id}>{item.content}</li>);
+
+  return (
+    <>
+      <ul>{ list }</ul>
+    </>
+  );
+}
+
+export default FetchAsYouRender;
+```
+
 
