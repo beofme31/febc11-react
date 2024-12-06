@@ -175,7 +175,7 @@ git pull upstream main
   * 충돌 발생시 임시로 필요한 코드만 복사
 ```sh
 cd febc11-react/sample
-npx degit https://github.com/uzoolove/febc11-react/sample/05 05 
+npx degit https://github.com/uzoolove/febc11-react/sample/01 01 
 ```
 
 ### sample 폴더 복사
