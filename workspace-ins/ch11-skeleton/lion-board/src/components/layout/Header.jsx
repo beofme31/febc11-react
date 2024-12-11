@@ -4,6 +4,11 @@ import { Link } from "react-router-dom";
 export default function Header() {
 
   const { user, resetUser } = useUserStore();
+  
+  const handleLogout = (event) => {
+    event.preventDefault();
+    resetUser();
+  };
 
   return (
     <header className="px-8 min-w-80 bg-slate-100 dark:bg-gray-600 text-gray-800 dark:text-gray-200 transition-color duration-500 ease-in-out">
@@ -25,7 +30,7 @@ export default function Header() {
         <div className="w-1/2 order-1 flex justify-end items-center md:order-2 md:w-auto">
 
           { user ? (
-            <form action="/">
+            <form onSubmit={ handleLogout }>
               <p className="flex items-center">
                 { user.profile && (
                   <img 
