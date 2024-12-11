@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo List App</title>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="module">
+    import yong from '../yong.js';
+    // 샘플 목록
+    let itemList = [
+      { no: 1, title: '두부', done: true} ,
+      { no: 2, title: '계란', done: false },
+      { no: 3, title: '라면', done: true },
+    ];
+
+    // 한건의 Todo 객체를 받아서 DOM 객체로 만들어 반환
+    function getTodoItemElem(item){
+      return (
+        yong.createElement('li', { 'data-no': item.no }, 
+          yong.createElement('span', null, item.no),
+          yong.createElement('span', { onclick: () => toggleDone(item.no) }, 
+            item.done? yong.createElement('s', null, item.title) : item.title), 
+          yong.createElement('button', { onclick: () => deleteItem(item.no) }, '삭제'))
+      );
+    }
+
+    function App(){
+
+      // "추가" 클릭 이벤트 핸들러
+      const handleAdd = () => {
+        const inputElem = document.querySelector('.todoinput > input');
+        if(inputElem.value.trim() !== ''){
+          addItem(inputElem.value);
+          inputElem.value = '';
+          inputElem.focus();
+        }
+      };
+
+      // 엔터 이벤트 핸들러
+      const handleAddKeyup = (event) => {
+        if(event.key === 'Enter') handleAdd();
+      };
+
+      const Header =
+        yong.createElement('header', null, 
+          yong.createElement('h1', null, 'Todo List - yong.createElement() 사용 :)'), 
+          yong.createElement('p', null, '파일 경로: ', 
+            yong.createElement('span', { id: 'filepath' }, `ch${document.URL.split('/ch')[1]}index.html`)));
+
+      const list = itemList.map((item) => getTodoItemElem(item));
+
+      const Todo = 
+        yong.createElement('div', { id: 'main' }, 
+          yong.createElement('div', { id: 'container' }, 
+            yong.createElement('ul', null, 
+              yong.createElement('li', null, 
+                yong.createElement('h2', null, '쇼핑 목록'), 
+                yong.createElement('div', { class: 'todoinput' }, 
+                  yong.createElement('input', { type: 'text', autofocus: '', onkeyup: event => handleAddKeyup(event) }), 
+                  yong.createElement('button', { type: 'button', onclick: handleAdd }, '추가')),
+                yong.createElement('ul', { class: 'todolist' }, list)))));
+
+      const Footer = 
+        yong.createElement('footer', null, 
+          yong.createElement('p', null, '멋쟁이 사자처럼 FrontEnd BootCamp'));
+      
+      return yong.createElement('div', { id: 'todo' }, Header, Todo, Footer);
+    }
+
+    yong.createRoot(document.getElementById('root')).render(App);
+
+    // 할일 추가
+    function addItem(title){
+      const item = {
+        no: itemList[itemList.length-1].no + 1,
+        title,
+        done: false,
+      };
+
+      // TODO: 데이터 갱신
+      itemList.push(item);
+
+      // TODO: 화면 갱신
+      const liElem = getTodoItemElem(item);
+      const todolistElem = document.querySelector('.todolist');
+      todolistElem.appendChild(liElem);
+    }
+
+    // 완료/미완료 처리
+    function toggleDone(no){
+      // TODO: 데이터 갱신
+      let selectedItem = itemList.find(item => item.no === no);
+      selectedItem.done = !selectedItem.done;
+
+      // TODO: 화면 갱신
+      const selectedLiElem = document.querySelector(`.todolist > li[data-no="${ no }"]`);
+      const titleSpanElem = selectedLiElem.children[1];
+      if(selectedItem.done){
+        const sElem = document.createElement('s');
+        sElem.appendChild(titleSpanElem.firstChild);
+        titleSpanElem.appendChild(sElem);
+      }else{
+        titleSpanElem.appendChild(titleSpanElem.firstChild.firstChild);
+        titleSpanElem.firstChild.remove();
+      }
+    }
+
+    // 할일 삭제
+    function deleteItem(no){
+      // TODO: 데이터 갱신
+      itemList = itemList.filter(item => item.no !== no);
+
+      // TODO: 화면 갱신
+      const selectedLiElem = document.querySelector(`.todolist > li[data-no="${ no }"]`);
+      selectedLiElem.remove();
+    }
+  </script>
+</body>
+</html>
