@@ -7,12 +7,13 @@ const UserStore = (set) => ({
   resetUser: () => set({ user: null }),
 });
 
-// const useUserStore = create(UserStore); // 스토리지를 사용하지 않을 경우
+// 스토리지를 사용하지 않을 경우
+// const useUserStore = create(UserStore);
 
 // 스토리지를 사용할 경우
-const useUserStore = create(persist(UserStore), {
+const useUserStore = create(persist(UserStore, {
   name: 'user',
   storage: createJSONStorage(() => sessionStorage) // 기본은 localStorage
-});
+}));
 
 export default useUserStore;
