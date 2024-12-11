@@ -29,7 +29,7 @@ function TodoEdit() {
       alert('할일이 수정 되었습니다.');
       // 할일 상세보기로 이동
       navigate(-1);
-      queryClient.invalidateQueries(['todolist', item._id]);
+      queryClient.invalidateQueries({ queryKey: ['todolist', item._id] });
     },
     onError: () => {},
   });

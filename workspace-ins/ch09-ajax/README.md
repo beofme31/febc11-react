@@ -586,7 +586,7 @@ axios.interceptors.response.use((response) => {
   ```sh
   npm i @tanstack/react-query-devtools
   ```
-  - 개발자 도구 사용 방법 참고: https://tanstack.com/query/latest/docs/react/devtools
+  - 개발자 도구 사용 방법 참고: https://tanstack.com/query/latest/docs/framework/react/devtools
 
 #### 사용 설정
 * App.jsx에 추가
@@ -662,14 +662,14 @@ useQuery(options)
   - false: 재시도 하지 않음
   - 정수: 재시도 횟수
 * suspense: suspense mode 활성화 여부(default false). suspense mode가 활성화 될 경우 React의 Suspense와 함께 사용 가능
-* 그밖의 옵션 참고: https://tanstack.com/query/latest/docs/react/reference/useQuery
+* 그밖의 옵션 참고: https://tanstack.com/query/latest/docs/framework/react/reference/useQuery
 
 ###### 리턴값
 * 다음의 속성을 가진 객체
   - isLoading: queryFn이 반환한 Promise가 pending 상태일때 true. queryFn이 axios를 사용한 함수라면 데이터 로딩중일때 true
   - error: queryFn이 반환한 Promise가 rejected 상태일때 에러 메세지. queryFn이 axios를 사용한 함수라면 에러가 발생했을때 에러 메세지
   - data: queryFn이 반환한 Promise가 fulfilled 상태일때 응답 데이터. queryFn이 axios를 사용한 함수라면 요청에 성공했을때 응답 데이터
-  - 그밖의 속성 참고: https://tanstack.com/query/latest/docs/react/reference
+  - 그밖의 속성 참고: https://tanstack.com/query/latest/docs/framework/react/reference/useQuery
 
 #### useMutation
 * 서버의 데이터를 변경할 때 사용(POST, PUT, PATCH, DELETE)
@@ -702,9 +702,10 @@ useQuery(options)
   ```jsx
   const queryClient = useQueryClient();
   // 새로운 댓글 작성시 3번 게시물의 댓글 목록을 무효화 시키고 서버에서 다시 가져옴
-  queryClient.invalidateQueries(['posts', 3, 'comments'])
+  queryClient.invalidateQueries({ queryKey: ['posts', 3, 'comments'] })
   ```
-* 참고: https://tanstack.com/query/latest/docs/react/reference/QueryClient#queryclientinvalidatequeries
+
+* 참고: https://tanstack.com/query/latest/docs/reference/QueryClient/#queryclientinvalidatequeries
 
 ## 데이터 패칭 패턴
 * 컴포넌트 렌더링과 비동기 데이터 로드 간의 관계를 정의하는 패턴으로 각 패턴은 데이터 요청과 UI 렌더링의 타이밍을 다르게 처리함

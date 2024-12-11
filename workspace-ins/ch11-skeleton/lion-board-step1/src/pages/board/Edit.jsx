@@ -16,7 +16,7 @@ export default function Edit() {
               placeholder="제목을 입력하세요." 
               className="w-full py-2 px-4 border rounded-md dark:bg-gray-700 border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
               name="title"
-              value="좋은 소식이 있습니다."
+              defaultValue="좋은 소식이 있습니다."
             />
 
             <p className="ml-2 mt-1 text-sm text-red-500 dark:text-red-400">제목은 필수 입니다.</p>
@@ -29,9 +29,8 @@ export default function Edit() {
               placeholder="내용을 입력하세요."
               className="w-full p-4 text-sm border rounded-lg border-gray-300 bg-gray-50 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
               name="content"
-            >좋은 소식을 가지고 왔습니다.
-오늘 드디어 최종 면접을 합니다.
-많이 응원해 주세요^^</textarea>
+              defaultValue="좋은 소식 감사합니다."
+            />
 
             <p className="ml-2 mt-1 text-sm text-red-500 dark:text-red-400">내용은 필수입니다.</p>
           </div>

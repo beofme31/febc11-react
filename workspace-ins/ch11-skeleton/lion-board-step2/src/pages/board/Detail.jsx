@@ -1,12 +1,9 @@
 import useAxiosInstance from "@hooks/useAxiosInstance";
 import CommentList from "@pages/board/CommentList";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import useUserStore from "@zustand/userStore";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 export default function Detail() {
-
-  const { user } = useUserStore();
   
   const axios = useAxiosInstance();
   const { type, _id } = useParams();
@@ -54,14 +51,8 @@ export default function Detail() {
           </div>
           <div className="flex justify-end my-4">
             <Link to={`/${type}`} className="bg-orange-500 py-1 px-4 text-base text-white font-semibold ml-2 hover:bg-amber-400 rounded">목록</Link>
-
-            { user?._id === data.item.user._id && (
-              <>
-                <Link to={`/${type}/${_id}/edit`} className="bg-gray-900 py-1 px-4 text-base text-white font-semibold ml-2 hover:bg-amber-400 rounded">수정</Link>
-                <button type="submit" className="bg-red-500 py-1 px-4 text-base text-white font-semibold ml-2 hover:bg-amber-400 rounded">삭제</button>
-              </>
-            ) }
-
+            <Link to={`/${type}/${_id}/edit`} className="bg-gray-900 py-1 px-4 text-base text-white font-semibold ml-2 hover:bg-amber-400 rounded">수정</Link>
+            <button type="submit" className="bg-red-500 py-1 px-4 text-base text-white font-semibold ml-2 hover:bg-amber-400 rounded">삭제</button>
           </div>
         </form>
       </section>
