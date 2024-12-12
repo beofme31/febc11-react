@@ -1197,6 +1197,7 @@ export default {
 * Login.jsx
   ```jsx
   const login = useMutation({
+    const location = useLocation();
     ......
     onSuccess: (res) => {
       ......
