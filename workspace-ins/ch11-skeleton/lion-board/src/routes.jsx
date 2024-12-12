@@ -1,12 +1,23 @@
-import Layout from '@components/layout';
-import Detail from '@pages/board/Detail';
-import Edit from '@pages/board/Edit';
-import List from '@pages/board/List';
-import New from '@pages/board/New';
-import MainPage from '@pages/index';
-import Login from '@pages/user/Login';
-import Signup from '@pages/user/Signup';
+// import Layout from '@components/layout';
+// import Detail from '@pages/board/Detail';
+// import Edit from '@pages/board/Edit';
+// import List from '@pages/board/List';
+// import New from '@pages/board/New';
+// import MainPage from '@pages/index';
+// import Login from '@pages/user/Login';
+// import Signup from '@pages/user/Signup';
+import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router-dom';
+
+const Layout = lazy(() => import('@components/layout'));
+const Detail = lazy(() => import('@pages/board/Detail'));
+const Edit = lazy(() => import('@pages/board/Edit'));
+const List = lazy(() => import('@pages/board/List'));
+const New = lazy(() => import('@pages/board/New'));
+// const ErrorPage = lazy(() => import('@pages/ErrorPage'));
+const MainPage = lazy(() => import('@pages/index'));
+const Login = lazy(() => import('@pages/user/Login'));
+const Signup = lazy(() => import('@pages/user/Signup'));
 
 const router = createBrowserRouter([
   {
