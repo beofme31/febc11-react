@@ -55,12 +55,12 @@ function useAxiosInstance() {
         // refresh 토큰으로 access 토큰 재발급 요청
         const { data: { accessToken } } = await instance.get(REFRESH_URL, {
           headers: {
-            Authorization: `Bearer ${user.refreshToken}`
+            Authorization: `Bearer ${ user.refreshToken }`
           }
         });
         setUser({ ...user, accessToken });
         // 갱신된 accessToken으로 재요청
-        config.headers.Authorization = `Bearer ${ accessToken }`;        
+        config.headers.Authorization = `Bearer ${ accessToken }`;
         return axios(config);
       }else{ // 로그인 안한 경우
         navigateLogin();

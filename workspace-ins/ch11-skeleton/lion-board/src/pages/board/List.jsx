@@ -2,10 +2,13 @@ import ListItem from "@pages/board/ListItem";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import useAxiosInstance from "@hooks/useAxiosInstance";
+import useUserStore from "@zustand/userStore";
 
 export default function List() {
 
   const axios = useAxiosInstance();
+
+  const { user } = useUserStore();
 
   // /:type
   // localhost/info => useParams()의 리턴값 { type: info }
@@ -42,7 +45,10 @@ export default function List() {
           <button type="submit" className="bg-orange-500 py-1 px-4 text-base text-white font-semibold ml-2 hover:bg-amber-400 rounded">검색</button>
         </form>
 
-        <Link to="new" className="bg-orange-500 py-1 px-4 text-base text-white font-semibold ml-2 hover:bg-amber-400 rounded">글작성</Link>
+        { user && 
+          <Link to="new" className="bg-orange-500 py-1 px-4 text-base text-white font-semibold ml-2 hover:bg-amber-400 rounded">글작성</Link>
+        }
+        
       </div>
       <section className="pt-10">
         <table className="border-collapse w-full table-fixed">
