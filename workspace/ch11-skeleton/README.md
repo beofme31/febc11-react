@@ -29,7 +29,7 @@ npx serve .
   # 기본 패키지 설치
   npm i
   # 추가 패키지 설치
-  npm i prop-types react-router-dom react-hook-form axios @tanstack/react-query @tanstack/react-query-devtools react-spinners react-toastify zustand
+  npm i prop-types react-router-dom react-hook-form axios @tanstack/react-query @tanstack/react-query-devtools react-spinners react-toastify zustand react-helmet-async
   npm i -D tailwindcss postcss autoprefixer
   # 개발 서버 실행
   npm run dev
@@ -547,9 +547,10 @@ export default {
     item: PropTypes.shape({
       _id: PropTypes.number.isRequired,
       user: PropTypes.shape({
-        name: PropTypes.string.isRequired,
+        _id: PropTypes.number,
+        name: PropTypes.string,
         image: PropTypes.string,
-      }).isRequired,
+      }),
       content: PropTypes.string.isRequired,
       createdAt: PropTypes.string.isRequired,
     }).isRequired,
@@ -910,7 +911,7 @@ export default {
           }
         });
 
-        userInfo.image = fileRes.data.item[0];
+        userInfo.image = fileRes.data.item[0].path;
         delete userInfo.attach;
       }
 
@@ -931,4 +932,679 @@ export default {
     },
     ```
 
+# 3단계
+* 전역 상태 관리
+  - 로그인과 JWT 토큰 관리
+  - 테마 적용
 
+## 로그인과 JWT 토큰 관리
+* 로그인 완료 후에 전달되는 토큰을 전역 상태관리로 저장
+* 로그인 여부에 따른 조건부 렌더링
+  - 환영 메세지 vs. 로그인 버튼
+  - 내가 작성한 게시글만 수정, 삭제 버튼 노출
+* Authorization 요청 헤더에 access token 추가
+
+### Zustand store 설정
+* src/zustand/userStore.js 생성
+  ```js
+  import { create } from "zustand";
+  import { persist, createJSONStorage } from 'zustand/middleware';
+
+  const UserStore = (set) => ({
+    user: null,
+    setUser: (user) => set({ user }),
+    resetUser: () => set({ user: null }),
+  });
+
+  // 스토리지를 사용하지 않을 경우
+  // const useUserStore = create(UserStore);
+
+  // 스토리지를 사용할 경우
+  const useUserStore = create(persist(UserStore, {
+    name: 'userStore',
+    storage: createJSONStorage(() => sessionStorage) // 기본은 localStorage
+  }));
+
+  export default useUserStore;
+  ```
+
+### 로그인 완료 후 토큰 저장
+* Login.jsx
+  - Zustand store의 setUser 꺼내기
+    ```jsx
+    const setUser = useUserStore(store => store.setUser);
+    ```
+
+  - 로그인 성공 후 호출되는 onSuccess에서 setUser 호출
+    ```jsx
+    onSuccess: (res) => {
+      const user = res.data.item;
+      setUser({
+        _id: user._id,
+        name: user.name,
+        profile: user.image,
+        accessToken: user.token.accessToken,
+        refreshToken: user.token.refreshToken,
+      });
+      alert(res.data.item.name + '님, 로그인 되었습니다.');
+      navigate(`/`);
+    }
+    ```
+
+### axios 요청 헤더에 Authorization 추가
+* useAxiosInstance.js
+  - user 꺼내기
+    ```js
+    function useAxiosInstance() {
+      const { user } = useUserStore();
+      ......
+    }
+    ```
+
+  - axios 요청 인터셉터에 추가
+    ```js
+    instance.interceptors.request.use((config) => {
+      ......
+      if(user){
+        let token = user.accessToken;
+        config.headers.Authorization = `Bearer ${ token }`;
+      }
+      ......
+    });
+    ```
+
+### 로그인 상태에 따른 조건부 렌더링
+* 로그인된 사용자에게는 사용자 정보를 보여주고 로그인되지 않은 사용자에게는 로그인 버튼과 회원가입 버튼을 보여줌
+* Header.jsx
+  - user 꺼내기
+    ```js
+    export default function Header() {
+      const { user } = useUserStore();
+      ......
+    }
+    ```
+  - sample/info/2/index.html의 `<header>` 영역의 `<form>` 태그 복사해서 작성
+    ```jsx
+    { user ? (
+      <form action="/">
+        <p className="flex items-center">
+          { user.profile && (
+            <img 
+              className="w-8 rounded-full mr-2" 
+              src={`https://11.fesp.shop${user.profile}`}
+              width="40" 
+              height="40" 
+              alt="프로필 이미지"
+            />
+          ) }
+          { user.name }님
+          <button type="submit" className="bg-gray-900 py-1 px-2 text-sm text-white font-semibold ml-2 hover:bg-amber-400 rounded">로그아웃</button>
+        </p>
+      </form>
+    ) : (
+      <div className="flex justify-end">
+        <Link to="/users/login" className="bg-orange-500 py-1 px-2 text-sm text-white font-semibold ml-2 hover:bg-amber-400 rounded">로그인</Link>
+        <Link to="/users/signup" className="bg-gray-900 py-1 px-2 text-sm text-white font-semibold ml-2 hover:bg-amber-400 rounded">회원가입</Link>
+      </div>
+    ) }
+    ```
+
+  - 로그아웃 기능 추가
+    ```jsx
+    export default function Header() {
+      const { user, resetUser } = useUserStore();
+      const handleLogout = (event) => {
+        event.preventDefault();
+        resetUser();
+      };
+    }
+    ```
+
+  - form에 submit 이벤트 추가
+    ```jsx
+    <form onSubmit={ handleLogout }>
+    ```
+* List.jsx
+  - 로그인 된 사용자만 게시글 작성 가능
+  ```jsx
+  const { user } = useUserStore();
+  ```
+
+  ```jsx
+  { user && 
+    <Link to={`/${type}/new`} className="......">글작성</Link>
+  }
+  ```
+
+* Detail.jsx
+  - 본인의 글에 대해서 수정, 삭제 버튼 노출
+  - 로그인 정보 꺼내기
+    ```jsx
+    export default function Detail() {
+      const { user } = useUserStore();
+      ......
+    }
+    ```
+
+  - 조건부 렌더링
+    ```jsx
+    { user?._id === data.item.user._id && (
+      <>
+        <Link to={`/${type}/${_id}/edit`} className="bg-gray-900 py-1 px-4 text-base text-white font-semibold ml-2 hover:bg-amber-400 rounded">수정</Link>
+        <button type="submit" className="bg-red-500 py-1 px-4 text-base text-white font-semibold ml-2 hover:bg-amber-400 rounded">삭제</button>
+      </>
+    ) }
+    ```
+
+  - 내가 작성한 글 상세조회 화면에서 로그아웃하면 수정, 삭제 버튼도 사라짐
+
+* CommentListItem.jsx
+  - 로그인 한 사용자에게만 자신의 댓글 삭제 버튼 추가
+    ```jsx
+    { user?._id === item.user._id &&  <button type="submit" className="bg-red-500 py-1 px-2 text-sm text-white font-semibold ml-2 hover:bg-amber-400 rounded">삭제</button> }
+    ```
+
+### access token 만료시 처리
+* access token이 만료되면 refresh token을 이용해서 access token을 재발급
+
+#### axios 인터셉터 설정
+* useAxiosInstance.js
+  ```jsx
+  import useUserStore from "@zustand/userStore";
+  import axios from "axios";
+  import { useLocation, useNavigate } from "react-router-dom";
+
+  // access token 재발급 URL
+  const REFRESH_URL = '/auth/refresh';
+
+  function useAxiosInstance() {
+    const { user, setUser } = useUserStore();
+
+    const navigate = useNavigate();
+    const location = useLocation();
+    
+    const instance = axios.create({
+      baseURL: 'https://11.fesp.shop',
+      timeout: 1000*15,
+      headers: {
+        'Content-Type': 'application/json', // request의 데이터 타입
+        accept: 'application/json', // response의 데이터 타입
+        'client-id': '00-board',
+      }
+    });
+
+    // 요청 인터셉터 추가하기
+    instance.interceptors.request.use((config) => {
+      // refresh 요청일 경우 Authorization 헤더는 이미 refresh token으로 지정되어 있음
+      if(user && config.url !== REFRESH_URL){
+        config.headers.Authorization = `Bearer ${ user.accessToken }`;
+      }
+      
+      // 요청이 전달되기 전에 필요한 공통 작업 수행
+      config.params = {
+        delay: 500,
+        ...config.params, // 기존 쿼리스트링 복사
+      };
+      return config;
+    });
+
+    // 응답 인터셉터 추가하기
+    instance.interceptors.response.use((response) => {
+      // 2xx 범위에 있는 상태 코드는 이 함수가 호출됨
+      // 응답 데이터를 이용해서 필요한 공통 작업 수행
+
+      return response;
+    }, async (error) => {
+      // 2xx 외의 범위에 있는 상태 코드는 이 함수가 호출됨
+      // 공통 에러 처리
+      console.error('인터셉터', error);
+      const { config, response } = error;
+
+      if(response?.status === 401){ // 인증 실패
+        if(config.url === REFRESH_URL){ // refresh token 만료
+          navigateLogin();
+        }else if(user){ // 로그인 했으나 access token 만료된 경우
+          // refresh 토큰으로 access 토큰 재발급 요청
+          const { data: { accessToken } } = await instance.get(REFRESH_URL, {
+            headers: {
+              Authorization: `Bearer ${user.refreshToken}`
+            }
+          });
+          setUser({ ...user, accessToken });
+          // 갱신된 accessToken으로 재요청
+          config.headers.Authorization = `Bearer ${ accessToken }`;        
+          return axios(config);
+        }else{ // 로그인 안한 경우
+          navigateLogin();
+        }
+      }
+      return Promise.reject(error);
+    });
+
+    function navigateLogin(){
+      const gotoLogin = confirm('로그인 후 이용 가능합니다.\n로그인 페이지로 이동하시겠습니까?');
+      gotoLogin && navigate('/users/login', { state: { from: location.pathname } });
+    }
+
+    return instance;
+  }
+
+  export default useAxiosInstance;
+  ```
+
+#### 로그인 후 페이지 이동
+* 로그인 하지 않은 상태로 인증이 필요한 API를 호출하면 로그인 페이지로 이동하는데 로그인을 완료한 후 이전 페이지로 이동하도록 구현
+* Login.jsx
+  ```jsx
+  const login = useMutation({
+    const location = useLocation();
+    ......
+    onSuccess: (res) => {
+      ......
+      alert(res.data.item.name + '님, 로그인 되었습니다.');
+      navigate(location.state?.from || `/`);
+    },
+  });
+  ```
+
+## 다크 모드 적용
+### Zustand store 설정
+* zustand/themeStore.js 생성
+  ```js
+  import { create } from "zustand";
+  import { persist } from 'zustand/middleware';
+
+  const ThemeStore = (set) => ({
+    isDarkMode: window.matchMedia('(prefers-color-scheme: dark)').matches ? true : false,
+    toggleTheme: () => set((state) => ({ isDarkMode: !state.isDarkMode })),
+  });
+
+  const useThemeStore = create(persist(ThemeStore, {
+    name: 'themeStore'
+  }));
+
+  export default useThemeStore;
+  ```
+
+### ThemeButton 컴포넌트 작성
+* components/ThemeButton.jsx 작성
+  - Header.jsx 에서 `<button>` 코드 복사
+  - 현재 설정된 모드에 따라 sun, moon 이미지 hidden
+  - onClick 이벤트 추가
+    ```jsx
+    import useThemeStore from "@zustand/themeStore";
+
+    export default function ThemeButton() {
+      const { isDarkMode, toggleTheme } = useThemeStore();
+
+      const sun = isDarkMode ? '' : 'hidden';
+      const moon = isDarkMode ? 'hidden' : '';
+      
+      console.log('isDarkMode', isDarkMode);
+
+      return (
+        <button
+          type="button"
+          data-toggle-dark="dark"
+          onClick={ toggleTheme }
+          className="......"
+        >
+          <svg
+            data-toggle-icon="moon"
+            className={`w-3.5 h-3.5 ${moon}`}
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 18 20"
+          >
+            <path d="......"></path>
+          </svg>
+          <svg
+            data-toggle-icon="sun"
+            className={`w-3.5 h-3.5 ${sun}`}
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="......"></path>
+          </svg>
+          <span className="sr-only">Toggle dark/light mode</span>
+        </button>
+      );
+    }
+    ```
+
+* Header.jsx
+  - `<ThemeButton>` 적용
+    ```jsx
+    <header>
+      <nav>      
+        ......
+        <div>
+          { user ? (
+            ......
+          ) : (
+            ......
+          ) }
+
+          <ThemeButton />
+
+        </div>
+      </nav>
+    </header>
+    ```
+
+### Tailwind CSS에 적용
+* 참고: https://tailwindcss.com/docs/dark-mode
+* 클래스명에 접두사로 `dark:`를 붙이면 다크 모드에서 적용되는 스타일을 지정할 수 있음
+* 예시
+  ```jsx
+  <header className="px-8 min-w-80 bg-slate-100 dark:bg-gray-600 text-gray-800 dark:text-gray-200 transition-color duration-500 ease-in-out">
+  ```
+
+#### Tailwind CSS의 다크 모드 전략
+
+##### media 전략
+- 기본값
+- CSS 미디어 기능 `prefers-color-scheme`를 이용해서 운영체제 설정을 따름
+
+##### selector 전략
+- 운영체제 설정에 의존하지 않고 수동으로 다크 모드 전환
+- `dark` 클래스가 적용되어 있는 요소의 모든 하위 요소에는 일반 클래스 대신 `dark:` 접두사가 붙어있는 클래스가 적용됨
+  - `<header>` 예시
+    + `bg-slate-100` 대신 `dark:bg-gray-600` 적용
+    + `text-gray-800` 대신 `dark:text-gray-200` 적용
+- tailwind.config.js 설정에 추가
+  ```js
+  export default {
+    ......
+    darkMode: "selector",
+  }
+  ```
+
+### 루트 엘리먼트에 dark 클래스 설정
+* App.jsx
+  ```jsx
+  function App() {
+    const { isDarkMode } = useThemeStore();
+    if(isDarkMode){
+      document.documentElement.classList.add('dark');
+    }else{
+      document.documentElement.classList.remove('dark');
+    }
+    ......
+  }
+  ```
+
+# 4단계
+* 배포
+* 최적화
+  - SEO
+  - 사용자 경험(UX) 최적화
+    + Lazy loading
+    + 로딩중 상태 표시(`<Suspense>` 사용)
+    + alert 대신 toast 사용
+    + NavLink 사용
+    + 에러 처리
+
+## 배포
+* 배포전 테스트
+```sh
+npm run build
+npm run preview
+```
+
+### Netlify
+* https://netlify.com
+
+* netlify 설정 파일 추가
+  - 프로젝트 루트에 netlify.toml 파일 생성(들여쓰기는 반드시 스페이스 2개를 이용)
+  - fallback url 추가: 클라이언트의 모든 url 요청에 index.html 응답 하도록 설정
+```yaml
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+```
+
+* https://netlify.com 접속해서 배포
+
+## 최적화
+### SEO(Search Engine Optimization)
+#### 메타 데이터 추가
+* index.html에 메타 데이터 추가
+* SPA는 하나의 html 페이지를 사용하므로 각 페이지별로 메타 데이터가 따로 적용되지 않고 모든 페이지에 일괄 적용됨
+  ```html
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/images/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>멋쟁이 사자처럼 커뮤니티 - 멋사컴</title>
+
+    <!-- 기본 meta 태그 -->
+    <meta name="description" content="다양한 주제의 커뮤니티와 활발한 소통을 위한 플랫폼입니다. 관심사에 따라 참여하고, 의견을 나누세요." />
+    <meta name="keywords" content="커뮤니티, 소통, 포럼, 관심사, 온라인 모임, 커뮤니티 서비스" />
+    <meta name="author" content="Front End Boot Camp" />
+
+    <!-- Open Graph meta 태그 (소셜 미디어용) -->
+    <meta property="og:title" content="멋사컴에 오신걸 환영합니다." />
+    <meta property="og:description" content="유용한 정보를 나누고 공유하세요." />
+    <meta property="og:image" content="/images/febc.png" />
+    <meta property="og:url" content="https://board.fesp.shop" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="멋사컴" />
+  </head>
+  ```
+
+#### 페이지별 다른 `<head>` 적용
+* 각 페이지 별로 다른 메타 데이터가 적용 되도록 `<head>` 내부의 태그를 동적으로 수정
+* react-helmet-async 이용
+* sample 하위 각 페이지의 `<head>` 참고
+  - List.jsx 예시
+    ```jsx
+    ......
+    return (
+      <>
+        <Helmet>
+          <title>{ type } - 멋사컴</title>
+          <meta property="og:title" content={`${ type } 게시판`} />
+          <meta property="og:description" content="유용한 정보를 나누고 공유하세요." />
+        </Helmet>
+
+        <main className="min-w-80 p-10">
+          ......
+        </main>
+      </>
+    );
+    ```
+
+### 사용자 경험(UX) 최적화
+#### 레이지 로딩
+* 참고: https://github.com/uzoolove/febc11-react/tree/main/workspace-ins/ch05-router#%EB%A0%88%EC%9D%B4%EC%A7%80-%EB%A1%9C%EB%94%A9-lazy-loading
+
+* routes.jsx
+  ```jsx
+  import { lazy } from 'react';
+  ```
+
+  ```jsx
+  const Layout = lazy(() => import('@components/layout'));
+  const Detail = lazy(() => import('@pages/board/Detail'));
+  const Edit = lazy(() => import('@pages/board/Edit'));
+  const List = lazy(() => import('@pages/board/List'));
+  const New = lazy(() => import('@pages/board/New'));
+  const ErrorPage = lazy(() => import('@pages/ErrorPage'));
+  const MainPage = lazy(() => import('@pages/index'));
+  const Login = lazy(() => import('@pages/user/Login'));
+  const Signup = lazy(() => import('@pages/user/Signup'));
+  ```
+
+#### 로딩중 상태 표시
+##### Spinner 컴포넌트 제작
+* components/Spinner.jsx 작성
+  ```jsx
+  import { HashLoader, ScaleLoader, SkewLoader } from "react-spinners";
+
+  const Spinner = {
+    FullScreen(){
+      return (
+        <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-gray-700 dark:text-gray-200">
+          <div className="flex flex-col items-center">
+            <h3 className="mb-4 text-lg font-semibold">잠시만 기다려주세요.</h3>
+            <HashLoader
+              color="#f58714"
+              size={60}
+            />
+          </div>
+        </div>
+      );
+    },
+    WithHeader(){
+      const screenHeight = window.innerHeight; // 현재 브라우저 창의 높이
+      const headerHeight = 68;
+      const footerHeight = 68;
+      const spinnerHeight = screenHeight - headerHeight - footerHeight; // 스피너 영역의 높이 계산
+
+      return (
+        <div className="flex items-center justify-center" style={{ height: spinnerHeight }}>
+          <div className="text-center">
+            <h3 className="mb-4 text-lg font-semibold">잠시만 기다려주세요.</h3>
+            <SkewLoader color="#F97316" />
+          </div>
+        </div>
+      );    
+    },
+    TargetArea(){
+      return (
+        <div className="flex justify-center">
+          <ScaleLoader color="#F97316"/>
+        </div>
+      );
+    }
+  };
+
+  export default Spinner;
+  ```
+
+##### Suspense 컴포넌트 사용
+* 참고: https://github.com/uzoolove/febc11-react/tree/main/workspace-ins/ch09-ajax#render-as-you-fetch
+* App.jsx
+  ```jsx
+  import { Suspense } from "react";
+  ```
+
+  ```jsx
+  <Suspense fallback={ <Spinner.FullScreen /> }>
+    <RouterProvider router={ router } />
+  </Suspense>
+  ```
+
+#### alert 대신 toast 사용
+* 참고: https://github.com/uzoolove/febc11-react/blob/main/workspace-ins/ch09-ajax/02-nike-axios/src/App.jsx#L71
+
+##### toast 설정
+* react-toastify 사용
+* App.jsx에 `<ToastContainer>` 추가
+  ```jsx
+  import { Slide, ToastContainer } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
+  ......
+  return (
+    <Suspense fallback={ <Spinner.FullScreen /> }>
+      <RouterProvider router={ router } />
+      <ToastContainer
+        position="top-center"
+        hideProgressBar={true}
+        autoClose={1500}
+        closeOnClick={true}
+        theme="light"
+        transition={ Slide }
+      />
+    </Suspense>
+  );
+  ```
+
+##### toast 사용 예시
+* Detail.jsx
+  ```jsx
+  import { Slide, toast } from 'react-toastify';
+  ......
+  const removeItem = useMutation({
+    mutationFn: () => axios.delete(`/posts/${_id}`),
+    onSuccess: () => {
+      // invalidateQueries는 쿼리가 active 상태일때(쿼리를 실행한 컴포넌트가 마운트 됨) refetch를 하고
+      // refetchQueries는 쿼리가 inactive 상태일때도(쿼리를 실행한 컴포넌트가 언마운트 됨) refetch를 함
+      queryClient.refetchQueries({ queryKey: ['posts', type] });
+      toast.success('삭제되었습니다.', {
+        onClose: () => navigate(`/${type}`)
+      });
+    }
+  });
+  ```
+
+#### NavLink 사용
+* 참고: https://github.com/uzoolove/febc11-react/tree/main/workspace-ins/ch05-router#navlink
+* Header.jsx의 Link를 NavLink로 교체
+  ```jsx
+  <NavLink className={ ({ isActive }) => isActive ? 'text-amber-500 font-semibold' : '' } to="/info">정보공유</NavLink>
+  <NavLink className={ ({ isActive }) => isActive ? 'text-amber-500 font-semibold' : '' } to="/free">자유게시판</NavLink>
+  <NavLink className={ ({ isActive }) => isActive ? 'text-amber-500 font-semibold' : '' } to="/qna">질문게시판</NavLink>
+  ```
+
+#### 에러 처리
+* 참고: https://github.com/uzoolove/febc11-react/tree/main/workspace-ins/ch05-router#%EC%97%90%EB%9F%AC-%EC%B2%98%EB%A6%AC-%EC%A0%84%EC%9A%A9-%EB%9D%BC%EC%9A%B0%ED%8A%B8
+* 참고: https://github.com/uzoolove/febc11-react/tree/main/workspace-ins/ch05-router#userouteerror
+
+* 컴포넌트에서 try~catch로 에러를 따로 처리하지 않을 경우 `<ErrorPage>`를 보여줌
+
+##### ErrorPage.jsx
+```jsx
+import Footer from "@components/layout/Footer";
+import Header from "@components/layout/Header";
+import { Helmet } from "react-helmet-async";
+import { useRouteError } from "react-router-dom";
+
+export default function ErrorPage() {
+  const err = useRouteError();
+  console.error(err);
+  const message = err.status === 404 ? '존재하지 않는 페이지입니다.' : '예상하지 못한 에러가 발생했습니다.';
+  return (
+    <>
+      <Helmet>
+        <title>멋쟁이 사자처럼 커뮤니티 - 멋사컴</title>
+        <meta property="og:title" content="에러가 발생했어요." />
+        <meta property="og:description" content={ message } />
+      </Helmet>
+      <div className="flex flex-col min-h-screen dark:bg-gray-700 dark:text-gray-200 transition-color duration-500 ease-in-out">
+        <Header />
+        <div className="py-20 bg-red-100 border border-red-400 text-red-700 p-4 rounded-lg flex flex-col items-center space-y-2">
+          <h2 className="text-xl font-semibold mb-2 text-center">🚧 앗, 무언가 잘못됐네요!</h2>
+          <h3 className="text-md font-semibold mb-2 text-center">{ message }</h3>
+          <p className="pt-12 text-center">이 오류는 더 나은 서비스를 위한 첫걸음이에요. 조금만 기다려 주세요!</p>
+          <button onClick={ () => window.location.reload() }
+            className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600">
+            ⚙️ 다시 시도
+          </button>
+        </div>
+        <Footer />
+      </div>
+    </>
+  );
+}
+```
+
+##### 에러 페이지 적용
+* routex.jsx
+  ```jsx
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      errorElement: <ErrorPage />,
+      element: <Layout />,
+      children: [
+        ......
+      ]
+    },
+  ]);
+  ```
